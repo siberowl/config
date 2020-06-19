@@ -162,7 +162,7 @@ nnoremap csw( mXbi(<esc>wea)<esc>`X
 nnoremap csw< mXbi<<esc>wea><esc>`X
 nnoremap csw" mXbi"<esc>wea"<esc>`X
 nnoremap csw' mXbi'<esc>wea'<esc>`X
-nnoremap dsw mXbdheldl`X
+nnoremap dsw mXbdheldl`Xh
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
