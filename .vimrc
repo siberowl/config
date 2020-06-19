@@ -100,7 +100,7 @@ set splitright
 let mapleader = (' ')
 
 "reload configuration
-noremap <F1> :source ~/.vimrc<CR>:echom "Updated configuration!"<CR>
+noremap <F1> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
 
 "Esc mapping
 inoremap jj <Esc>
@@ -190,7 +190,7 @@ function! SwitchScroll()
 		let s:freeze = "off"
 	else
 		echom "turning on centering"
-		set scrolloff=99
+		set scrolloff=999
 		let s:freeze = "on"
 	endif
 endfunction
