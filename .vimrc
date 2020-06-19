@@ -156,13 +156,13 @@ noremap <C-L> <C-W><C-L>
 noremap <C-H> <C-W><C-H>
 
 "surround commands
-nnoremap csw{ mXbi{<esc>wwi}<esc>`X
-nnoremap csw[ mXbi[<esc>wwi]<esc>`X
-nnoremap csw( mXbi(<esc>wwi)<esc>`X
-nnoremap csw< mXbi<<esc>wwi><esc>`X
-nnoremap csw" mXbi"<esc>wwi"<esc>`X
-nnoremap csw' mXbi'<esc>wwi'<esc>`X
-nnoremap dsw mXbdhwdl`X
+nnoremap csw{ mXbi{<esc>wea}<esc>`X
+nnoremap csw[ mXbi[<esc>wea]<esc>`X
+nnoremap csw( mXbi(<esc>wea)<esc>`X
+nnoremap csw< mXbi<<esc>wea><esc>`X
+nnoremap csw" mXbi"<esc>wea"<esc>`X
+nnoremap csw' mXbi'<esc>wea'<esc>`X
+nnoremap dsw mXbdheldl`X
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
