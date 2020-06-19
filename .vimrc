@@ -14,11 +14,9 @@ Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'dense-analysis/ale'
-Plug 'Chiel92/vim-autoformat'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
-Plug 'jonhoo/proximity-sort'
 call plug#end()
 
 
@@ -94,6 +92,8 @@ set splitright
 "Concept:
 "For one time actions, Leader then key in succcession is mapped.
 "For actions likely to be repeated, Shift+key is mapped.
+"
+"Maps that use marker 'X' to keep current position have a *.
 "=============================================================
 
 "Set leader
@@ -105,14 +105,14 @@ noremap <F1> :source ~/.vimrc<CR>:echom "Updated configuration!"<CR>
 "Esc mapping
 inoremap jj <Esc>
 
-"yanking file without disturbing
-noremap <Leader>y maggVGy`a
+"Open vimrc
+noremap <Leader>v :tabe ~/.vimrc<CR>
 
-"jump to last edit
-noremap <Leader>; `.
+"yanking file *
+noremap <Leader>y mXggVGy`X
 
 "clear line(delete but keep the empty line)
-noremap <Leader>d ddO<Esc>
+noremap <Leader>dd ddO<Esc>
 
 "turn off highlighting in normal mode
 noremap <Leader>h :nohlsearch<CR>:echo<CR>
@@ -127,7 +127,11 @@ inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
 noremap <Leader>. $
 noremap <Leader>, ^
 
-"Disable arrow keys in normal mode
+"allow up and down for wrapped line
+nnoremap j gj
+nnoremap k gk
+
+"Disable arrow keys in non-insert mode
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Right> <Nop>
@@ -146,18 +150,19 @@ inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
 
 "split navigation
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+noremap <C-J> <C-W><C-J>
+noremap <C-K> <C-W><C-K>
+noremap <C-L> <C-W><C-L>
+noremap <C-H> <C-W><C-H>
 
-"Bracket auto-enclose
-noremap <Leader>e{ bi{<Esc>wwi}<Esc> 
-noremap <Leader>e( bi(<Esc>wwi)<Esc> 
-noremap <Leader>e[ bi[<Esc>wwi]<Esc> 
-noremap <Leader>e< bi<<Esc>wwi><Esc> 
-noremap <Leader>e" bi"<Esc>wwi"<Esc> 
-noremap <Leader>e' bi'<Esc>wwi'<Esc> 
+"surround commands
+nnoremap csw{ mXbi{<esc>wwi}<esc>`X
+nnoremap csw[ mXbi[<esc>wwi]<esc>`X
+nnoremap csw( mXbi(<esc>wwi)<esc>`X
+nnoremap csw< mXbi<<esc>wwi><esc>`X
+nnoremap csw" mXbi"<esc>wwi"<esc>`X
+nnoremap csw' mXbi'<esc>wwi'<esc>`X
+nnoremap dsw mXbdhwdl`X
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -176,7 +181,7 @@ function! FindReplace(pattern, replacement)
 endfunction
 
 "scrolling
-noremap <Leader>c :call SwitchScroll()<CR> 
+noremap <Leader>s :call SwitchScroll()<CR> 
 let s:freeze = "on"
 function! SwitchScroll()
 	if s:freeze == "on"
