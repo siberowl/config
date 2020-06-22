@@ -81,6 +81,9 @@ set title
 "scrolling
 set scrolloff=999
 
+"turn off swap
+set noswapfile
+
 "window splitting
 set splitbelow
 set splitright
@@ -96,11 +99,14 @@ set splitright
 "Maps that use marker 'X' to keep current position have a *.
 "=============================================================
 
+"map colon
+noremap ; :
+
 "Set leader
 let mapleader = (' ')
 
 "reload configuration
-noremap <F1> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
 
 "Esc mapping
 inoremap jj <Esc>
@@ -111,11 +117,8 @@ noremap <Leader>v :tabe ~/.vimrc<CR>
 "yanking file *
 noremap <Leader>y mXggVGy`X
 
-"clear line(delete but keep the empty line)
-noremap <Leader>dd ddO<Esc>
-
 "turn off highlighting in normal mode
-noremap <Leader>h :nohlsearch<CR>:echo<CR>
+noremap <BS> :nohlsearch<CR>:echo<CR>
 
 "Two spacebars to save
 noremap <Leader><Leader> :w<CR>
@@ -163,6 +166,12 @@ nnoremap csw< mXbi<<esc>wea><esc>`X
 nnoremap csw" mXbi"<esc>wea"<esc>`X
 nnoremap csw' mXbi'<esc>wea'<esc>`X
 nnoremap dsw mXbdheldl`Xh
+nnoremap ds{ mXF{dlf}dl`Xh
+nnoremap ds[ mXF[dlf]dl`Xh
+nnoremap ds( mXF(dlf)dl`Xh
+nnoremap ds< mXF<dlf>dl`Xh
+nnoremap ds" mXF"dlf"dl`Xh
+nnoremap ds' mXF'dlf'dl`Xh
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -216,10 +225,19 @@ function! TabRight()
       execute "tabm +1"
    endif
 endfunction
-noremap } :tabn<CR>
-noremap { :tabp<CR>
-noremap ) :call TabRight()<CR>
-noremap ( :call TabLeft()<CR>
+nnoremap } :tabn<CR>
+nnoremap { :tabp<CR>
+nnoremap ) :call TabRight()<CR>
+nnoremap ( :call TabLeft()<CR>
+nnoremap <Leader>a 1gt
+nnoremap <Leader>s 2gt
+nnoremap <Leader>d 3gt
+nnoremap <Leader>f 4gt
+nnoremap <Leader>g 5gt
+nnoremap <Leader>h 6gt
+nnoremap <Leader>j 7gt
+nnoremap <Leader>k 8gt
+nnoremap <Leader>l 9gt
 
 
 "====================================================================================
@@ -240,7 +258,7 @@ let g:syntastic_cpp_checkers = ['cpplint']
 
 augroup filetype_js
   autocmd!
-  :autocmd BufWritePost *.js execute ':PrettierAsync'
+  :autocmd BufWritePost *.js execute ':Prettier'
   :autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
   :autocmd FileType javascript noremap <C-/> // <Esc>
 augroup end
