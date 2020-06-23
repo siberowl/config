@@ -88,6 +88,9 @@ set noswapfile
 set splitbelow
 set splitright
 
+"Set backspace behavior
+set backspace=indent,eol,start
+
 
 "=============================================================
 "Mappings
@@ -99,14 +102,11 @@ set splitright
 "Maps that use marker 'X' to keep current position have a *.
 "=============================================================
 
-"map colon
-noremap ; :
-
 "Set leader
 let mapleader = (' ')
 
 "reload configuration
-noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+noremap <F5> :se all& <CR>:source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
 
 "Esc mapping
 inoremap jj <Esc>
@@ -118,7 +118,7 @@ noremap <Leader>v :tabe ~/.vimrc<CR>
 noremap <Leader>y mXggVGy`X
 
 "turn off highlighting in normal mode
-noremap <BS> :nohlsearch<CR>:echo<CR>
+nnoremap <Leader>h :nohlsearch<CR>:echo<CR>
 
 "Two spacebars to save
 noremap <Leader><Leader> :w<CR>
@@ -140,12 +140,6 @@ noremap <Down> <Nop>
 noremap <Right> <Nop>
 noremap <Left> <Nop>
 
-"Mapping arrow keys in insert mode
-inoremap <C-h> <left>
-inoremap <C-j> <down>
-inoremap <C-k> <up>
-inoremap <C-l> <right>
-
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
 inoremap {<CR>  {<CR>}<Esc>O
@@ -153,10 +147,12 @@ inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
 
 "split navigation
-noremap <C-J> <C-W><C-J>
-noremap <C-K> <C-W><C-K>
-noremap <C-L> <C-W><C-L>
-noremap <C-H> <C-W><C-H>
+nnoremap <C-h> <C-W><C-J>
+nnoremap <C-k> <C-W><C-K>
+nnoremap <C-l> <C-W><C-L>
+nnoremap <C-h> <C-W><C-H>
+nnoremap + <C-W>>
+nnoremap _ <C-W><
 
 "surround commands
 nnoremap csw{ mXbi{<esc>wea}<esc>`X
@@ -190,7 +186,7 @@ function! FindReplace(pattern, replacement)
 endfunction
 
 "scrolling
-noremap <Leader>s :call SwitchScroll()<CR> 
+nnoremap <Leader>c :call SwitchScroll()<CR> 
 let s:freeze = "on"
 function! SwitchScroll()
 	if s:freeze == "on"
@@ -203,14 +199,15 @@ function! SwitchScroll()
 		let s:freeze = "on"
 	endif
 endfunction
-noremap <s-j> jjj
-noremap <s-k> kkk
-noremap <s-h> hhh
-noremap <s-l> lll
+nnoremap <s-j> jjj
+nnoremap <s-k> kkk
 
 "vim tab switcher
-noremap <s-t> :tabe <C-d>
-noremap <s-w> :q<Bar>:echo<CR>
+nnoremap <Leader>t :tabe <C-d>
+nnoremap <Leader>w :q<Bar>:echo<CR>
+nnoremap <Leader>l :tabs<CR>
+nnoremap <Leader>d :cd <C-d>
+nnoremap <Leader>s :vs <C-d>
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
@@ -225,19 +222,19 @@ function! TabRight()
       execute "tabm +1"
    endif
 endfunction
-nnoremap } :tabn<CR>
-nnoremap { :tabp<CR>
+nnoremap L :tabn<CR>
+nnoremap H :tabp<CR>
 nnoremap ) :call TabRight()<CR>
 nnoremap ( :call TabLeft()<CR>
-nnoremap <Leader>a 1gt
-nnoremap <Leader>s 2gt
-nnoremap <Leader>d 3gt
-nnoremap <Leader>f 4gt
-nnoremap <Leader>g 5gt
-nnoremap <Leader>h 6gt
-nnoremap <Leader>j 7gt
-nnoremap <Leader>k 8gt
-nnoremap <Leader>l 9gt
+nnoremap <Leader>ma 1gt
+nnoremap <Leader>ms 2gt
+nnoremap <Leader>md 3gt
+nnoremap <Leader>mf 4gt
+nnoremap <Leader>mg 5gt
+nnoremap <Leader>mh 6gt
+nnoremap <Leader>mj 7gt
+nnoremap <Leader>mk 8gt
+nnoremap <Leader>ml 9gt
 
 
 "====================================================================================
