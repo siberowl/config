@@ -17,6 +17,7 @@ Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
+Plug 'easymotion/vim-easymotion'
 call plug#end()
 
 
@@ -33,6 +34,10 @@ colo corvine_light
 let g:lightline = {
       \ 'colorscheme': 'selenized_light',
       \ }
+let g:lightline.enable = {
+            \ 'statusline': 1,
+            \ 'tabline': 1
+            \ }
 
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
@@ -69,8 +74,11 @@ set cursorline
 "show status line
 set laststatus=2
 
+"show tabline
+set showtabline=2
+
 "highlight searched word
-set hlsearch
+set hlsearch!
 
 "show autocomplete options on tab
 set wildmenu
@@ -87,6 +95,10 @@ set noswapfile
 "window splitting
 set splitbelow
 set splitright
+
+"set autoindent
+set autoindent
+set smartindent
 
 "Set backspace behavior
 set backspace=indent,eol,start
@@ -105,8 +117,8 @@ set backspace=indent,eol,start
 "Set leader
 let mapleader = (' ')
 
-"reload configuration
-noremap <F5> :se all& <CR>:source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+"Map semiclon
+nnoremap ; :
 
 "Esc mapping
 inoremap jj <Esc>
@@ -120,8 +132,11 @@ noremap <Leader>y mXggVGy`X
 "turn off highlighting in normal mode
 nnoremap <Leader>h :nohlsearch<CR>:echo<CR>
 
-"Two spacebars to save
+"Save
 noremap <Leader><Leader> :w<CR>
+
+"Quit
+noremap <Leader>w :q<CR>
 
 "copyright message
 inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
@@ -155,12 +170,14 @@ nnoremap + <C-W>>
 nnoremap _ <C-W><
 
 "surround commands
-nnoremap csw{ mXbi{<esc>wea}<esc>`X
-nnoremap csw[ mXbi[<esc>wea]<esc>`X
-nnoremap csw( mXbi(<esc>wea)<esc>`X
-nnoremap csw< mXbi<<esc>wea><esc>`X
-nnoremap csw" mXbi"<esc>wea"<esc>`X
-nnoremap csw' mXbi'<esc>wea'<esc>`X
+nnoremap csw{ mXbi{<esc>ea}<esc>`X
+nnoremap csw[ mXbi[<esc>ea]<esc>`X
+nnoremap csw( mXbi(<esc>ea)<esc>`X
+nnoremap csw< mXbi<<esc>ea><esc>`X
+nnoremap csw" mXbi"<esc>ea"<esc>`X
+nnoremap csw' mXbi'<esc>ea'<esc>`X
+nnoremap csw_ mXbi_<esc>ea_<esc>`X
+nnoremap csw** mXbi**<esc>ea**<esc>`X
 nnoremap dsw mXbdheldl`Xh
 nnoremap ds{ mXF{dlf}dl`Xh
 nnoremap ds[ mXF[dlf]dl`Xh
@@ -168,6 +185,20 @@ nnoremap ds( mXF(dlf)dl`Xh
 nnoremap ds< mXF<dlf>dl`Xh
 nnoremap ds" mXF"dlf"dl`Xh
 nnoremap ds' mXF'dlf'dl`Xh
+
+"reload configuration
+noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+nnoremap <Leader>=q :QuitSession<CR>
+nnoremap <Leader>=r :RestoreSession<CR>
+command! QuitSession execute ':mks! ~/.vim/sessions/default | :wqa'
+command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
+
+"EasyMotion setup
+map , <Plug>(easymotion-prefix)
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+map  n <Plug>(easymotion-next)
+map  N <Plug>(easymotion-prev)
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -199,14 +230,12 @@ function! SwitchScroll()
 		let s:freeze = "on"
 	endif
 endfunction
-nnoremap <s-j> jjj
-nnoremap <s-k> kkk
+nnoremap <s-j> :+3<CR>
+nnoremap <s-k> :-3<CR>
 
 "vim tab switcher
 nnoremap <Leader>t :tabe <C-d>
-nnoremap <Leader>w :q<Bar>:echo<CR>
 nnoremap <Leader>l :tabs<CR>
-nnoremap <Leader>d :cd <C-d>
 nnoremap <Leader>s :vs <C-d>
 function! TabLeft()
    if tabpagenr() == 1
