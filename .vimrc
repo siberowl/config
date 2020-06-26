@@ -79,6 +79,7 @@ set showtabline=2
 
 "highlight searched word
 set hlsearch!
+set nohlsearch
 
 "show autocomplete options on tab
 set wildmenu
