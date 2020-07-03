@@ -55,6 +55,19 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
+
+"terminal colors
+"text: #CBEFF4
+"background: #002B36
+"1: #1E8098
+"2: #F03632
+"3: #84F8A0
+"4: #FFC34E
+"5: #93C8F6
+"6: #F74D9F
+"7: #2AA198
+"8: #FDF6E3
+
 "allow undo previous to closing
 if has('persistent_undo')
     set undodir=~/.vim/undo
