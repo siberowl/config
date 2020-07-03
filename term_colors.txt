@@ -10,3 +10,4 @@ background: #002B36
 7: #2AA198
 8: #FDF6E3
 
+https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md#clearance
