@@ -171,21 +171,21 @@ nnoremap + <C-W>>
 nnoremap _ <C-W><
 
 "surround commands
-nnoremap csw{ mXbi{<esc>ea}<esc>`X
-nnoremap csw[ mXbi[<esc>ea]<esc>`X
-nnoremap csw( mXbi(<esc>ea)<esc>`X
-nnoremap csw< mXbi<<esc>ea><esc>`X
-nnoremap csw" mXbi"<esc>ea"<esc>`X
-nnoremap csw' mXbi'<esc>ea'<esc>`X
-nnoremap csw_ mXbi_<esc>ea_<esc>`X
-nnoremap csw** mXbi**<esc>ea**<esc>`X
-nnoremap dsw mXbdheldl`Xh
+nnoremap csw{ mXlbi{<esc>ea}<esc>`X
+nnoremap csw[ mXlbi[<esc>ea]<esc>`X
+nnoremap csw( mXlbi(<esc>ea)<esc>`X
+nnoremap csw< mXlbi<<esc>ea><esc>`X
+nnoremap csw" mXlbi"<esc>ea"<esc>`X
+nnoremap csw' mXlbi'<esc>ea'<esc>`X
+nnoremap csw` mXlbi`<esc>ea`<esc>`X
+nnoremap dsw mXlbdheldl`Xh
 nnoremap ds{ mXF{dlf}dl`Xh
 nnoremap ds[ mXF[dlf]dl`Xh
 nnoremap ds( mXF(dlf)dl`Xh
 nnoremap ds< mXF<dlf>dl`Xh
 nnoremap ds" mXF"dlf"dl`Xh
 nnoremap ds' mXF'dlf'dl`Xh
+nnoremap ds` mXF`dlf`dl`Xh
 
 "reload configuration
 noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
@@ -285,7 +285,7 @@ let g:syntastic_cpp_checkers = ['cpplint']
 
 augroup filetype_js
   autocmd!
-  :autocmd BufWritePost *.js execute ':Prettier'
+  :autocmd BufWritePost *.js execute ':PrettierAsync'
   :autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
   :autocmd FileType javascript noremap <C-/> // <Esc>
 augroup end
@@ -298,9 +298,9 @@ augroup filetype_py
   :autocmd FileType python,py noremap <C-/> A# <Esc>
 augroup end
 
-augroup filetype_xml
+augroup filetype_json
 	autocmd!
-"	autocmd BufWritePost *.html execute ':Autoformat'
+	:autocmd BufWritePost *.json execute ':%!jq .'
 augroup end
 let g:syntastic_python_flake8_exec = 'flake8'
 let g:syntastic_python_checkers = ['flake8']
