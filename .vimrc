@@ -125,7 +125,7 @@ nnoremap ; :
 inoremap jj <Esc>
 
 "Open vimrc
-noremap <Leader>v :tabe ~/.vimrc<CR>
+noremap <F6> :tabe ~/.vimrc<CR>
 
 "yanking file *
 noremap <Leader>y mXggVGy`X
@@ -136,11 +136,11 @@ nnoremap <Leader>h :nohlsearch<CR>:echo<CR>
 "Save
 noremap <Leader><Leader> :w<CR>
 
-"Quit
-noremap <Leader>w :q<CR>
-
 "copyright message
 inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
+
+"Quit
+noremap <Leader>w :q<CR>
 
 "mapping start and end
 noremap <Leader>. $
@@ -150,25 +150,34 @@ noremap <Leader>, ^
 nnoremap j gj
 nnoremap k gk
 
+"ls
+nnoremap <Leader>l :tabs<CR>
+
+"explore
+nnoremap <Leader>e :Explore<CR>
+
+"JSDoc mapping
+noremap <Leader>/ i/**<CR><CR>/<Up>
+
+"print registers
+nnoremap <Leader>r :registers<CR>
+
+"macro shortcut
+nnoremap Q @q
+vnoremap Q :norm @q<CR>
+
 "Disable arrow keys in non-insert mode
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Right> <Nop>
 noremap <Left> <Nop>
 
+
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
 inoremap {<CR>  {<CR>}<Esc>O
 inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
-
-"split navigation
-nnoremap <C-h> <C-W><C-J>
-nnoremap <C-k> <C-W><C-K>
-nnoremap <C-l> <C-W><C-L>
-nnoremap <C-h> <C-W><C-H>
-nnoremap + <C-W>>
-nnoremap _ <C-W><
 
 "surround commands
 nnoremap csw{ mXlbi{<esc>ea}<esc>`X
@@ -218,26 +227,28 @@ function! FindReplace(pattern, replacement)
 endfunction
 
 "scrolling
-nnoremap <Leader>c :call SwitchScroll()<CR> 
-let s:freeze = "on"
-function! SwitchScroll()
-	if s:freeze == "on"
-		echom "turning off centering"
-		set scrolloff=0
-		let s:freeze = "off"
-	else
-		echom "turning on centering"
-		set scrolloff=999
-		let s:freeze = "on"
-	endif
-endfunction
 nnoremap <s-j> :+3<CR>
 nnoremap <s-k> :-3<CR>
 
+"Split view
+nnoremap <Leader>v; mX :tabe %<CR> `X :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f>
+nnoremap <Leader>vo :only<CR>
+nnoremap <Leader>vv :vs %<CR>
+nnoremap <Leader>vs :vs <C-d>
+
+"window splitting
+set splitbelow
+set splitright
+
+nnoremap <C-j> <C-W><C-J>
+nnoremap <C-k> <C-W><C-K>
+nnoremap <C-l> <C-W><C-L>
+nnoremap <C-h> <C-W><C-H>
+nnoremap + <C-W>>
+nnoremap _ <C-W><
+
 "vim tab switcher
 nnoremap <Leader>t :tabe <C-d>
-nnoremap <Leader>l :tabs<CR>
-nnoremap <Leader>s :vs <C-d>
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
