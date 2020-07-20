@@ -104,6 +104,10 @@ set smartindent
 "Set backspace behavior
 set backspace=indent,eol,start
 
+"netrw settings
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+
 
 "=============================================================
 "Mappings
@@ -154,7 +158,7 @@ nnoremap k gk
 nnoremap <Leader>l :tabs<CR>
 
 "explore
-nnoremap <Leader>e :Explore<CR>
+nnoremap <Leader>e :vs<CR> <C-W>H :Explore<CR> 70<C-W><<CR>
 
 "JSDoc mapping
 noremap <Leader>/ i/**<CR><CR>/<Up>
@@ -231,7 +235,7 @@ nnoremap <s-j> :+3<CR>
 nnoremap <s-k> :-3<CR>
 
 "Split view
-nnoremap <Leader>v; mX :tabe %<CR> `X :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f>
+nnoremap <Leader>v; mX :tabe %<CR> `X :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :q
 nnoremap <Leader>vo :only<CR>
 nnoremap <Leader>vv :vs %<CR>
 nnoremap <Leader>vs :vs <C-d>
