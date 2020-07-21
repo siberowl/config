@@ -17,6 +17,7 @@ Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
+Plug 'gcmt/taboo.vim'
 Plug 'easymotion/vim-easymotion'
 call plug#end()
 
@@ -36,7 +37,7 @@ let g:lightline = {
       \ }
 let g:lightline.enable = {
             \ 'statusline': 1,
-            \ 'tabline': 1
+            \ 'tabline': 0 
             \ }
 
 " Customize fzf colors to match your color scheme
@@ -108,6 +109,15 @@ set backspace=indent,eol,start
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 
+"Disable save warning
+set hidden
+
+"Automatically set directory to current file
+autocmd BufEnter * silent! lcd %:p:h
+
+"Do not store globals and lobal values in a session
+set ssop-=options    
+set ssop-=globals
 
 "=============================================================
 "Mappings
@@ -145,6 +155,7 @@ inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
 
 "Quit
 noremap <Leader>w :q<CR>
+noremap <Leader>d :bd<CR>
 
 "mapping start and end
 noremap <Leader>. $
@@ -154,17 +165,14 @@ noremap <Leader>, ^
 nnoremap j gj
 nnoremap k gk
 
-"ls
-nnoremap <Leader>l :tabs<CR>
-
-"explore
-nnoremap <Leader>e :vs<CR> <C-W>H :Explore<CR> 70<C-W><<CR>
-
-"JSDoc mapping
-noremap <Leader>/ i/**<CR><CR>/<Up>
-
 "print registers
 nnoremap <Leader>r :registers<CR>
+
+"list buffers
+nnoremap <Leader>l :ls<CR>
+
+"cd
+nnoremap <Leader>c :cd <C-d>
 
 "macro shortcut
 nnoremap Q @q
@@ -202,8 +210,10 @@ nnoremap ds` mXF`dlf`dl`Xh
 
 "reload configuration
 noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
+command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
 command! QuitSession execute ':mks! ~/.vim/sessions/default | :wqa'
 command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
 
@@ -212,7 +222,7 @@ map , <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 map  n <Plug>(easymotion-next)
-map  N <Plug>(easymotion-prev)
+map  p <Plug>(easymotion-prev)
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -230,29 +240,33 @@ function! FindReplace(pattern, replacement)
 	call Find(a:replacement)
 endfunction
 
-"scrolling
-nnoremap <s-j> :+3<CR>
-nnoremap <s-k> :-3<CR>
+"Explorer
+nnoremap <Leader>e :Explore<CR>
 
 "Split view
-nnoremap <Leader>v; mX :tabe %<CR> `X :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :vs<CR><C-f> :q
 nnoremap <Leader>vo :only<CR>
-nnoremap <Leader>vv :vs %<CR>
 nnoremap <Leader>vs :vs <C-d>
+nnoremap <Leader>vv :vs<CR>:Explore<CR>
+nnoremap <Leader>vh :sp<CR>:Explore<CR>
 
 "window splitting
 set splitbelow
 set splitright
 
-nnoremap <C-j> <C-W><C-J>
-nnoremap <C-k> <C-W><C-K>
-nnoremap <C-l> <C-W><C-L>
-nnoremap <C-h> <C-W><C-H>
-nnoremap + <C-W>>
-nnoremap _ <C-W><
+nnoremap J <C-W><C-J>
+nnoremap K <C-W><C-K>
+nnoremap L <C-W><C-L>
+nnoremap H <C-W><C-H>
 
+"buffer navigation
+nnoremap <Leader>b :ls<CR>:b<space>
+nnoremap <Leader><tab> :b#<CR>
+ 
+"marker navigation
+nnoremap <Leader>m :<C-u>marks<CR>:normal! `
+ 
 "vim tab switcher
-nnoremap <Leader>t :tabe <C-d>
+nnoremap <Leader>t :tabe<CR>:TabooRename<space>
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
@@ -267,19 +281,10 @@ function! TabRight()
       execute "tabm +1"
    endif
 endfunction
-nnoremap L :tabn<CR>
-nnoremap H :tabp<CR>
+nnoremap <C-l> :tabn<CR>
+nnoremap <C-h> :tabp<CR>
 nnoremap ) :call TabRight()<CR>
 nnoremap ( :call TabLeft()<CR>
-nnoremap <Leader>ma 1gt
-nnoremap <Leader>ms 2gt
-nnoremap <Leader>md 3gt
-nnoremap <Leader>mf 4gt
-nnoremap <Leader>mg 5gt
-nnoremap <Leader>mh 6gt
-nnoremap <Leader>mj 7gt
-nnoremap <Leader>mk 8gt
-nnoremap <Leader>ml 9gt
 
 
 "====================================================================================
