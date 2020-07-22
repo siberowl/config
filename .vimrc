@@ -17,7 +17,6 @@ Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
-Plug 'gcmt/taboo.vim'
 Plug 'easymotion/vim-easymotion'
 call plug#end()
 
@@ -37,7 +36,7 @@ let g:lightline = {
       \ }
 let g:lightline.enable = {
             \ 'statusline': 1,
-            \ 'tabline': 0 
+            \ 'tabline': 1 
             \ }
 
 " Customize fzf colors to match your color scheme
@@ -119,6 +118,9 @@ autocmd BufEnter * silent! lcd %:p:h
 set ssop-=options    
 set ssop-=globals
 
+"Use tabs for buffer switching
+set switchbuf=usetab
+
 "=============================================================
 "Mappings
 "
@@ -155,7 +157,6 @@ inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
 
 "Quit
 noremap <Leader>w :q<CR>
-noremap <Leader>d :bd<CR>
 
 "mapping start and end
 noremap <Leader>. $
@@ -192,24 +193,52 @@ inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
 
 "surround commands
-nnoremap csw{ mXlbi{<esc>ea}<esc>`X
-nnoremap csw[ mXlbi[<esc>ea]<esc>`X
-nnoremap csw( mXlbi(<esc>ea)<esc>`X
-nnoremap csw< mXlbi<<esc>ea><esc>`X
-nnoremap csw" mXlbi"<esc>ea"<esc>`X
-nnoremap csw' mXlbi'<esc>ea'<esc>`X
-nnoremap csw` mXlbi`<esc>ea`<esc>`X
-nnoremap dsw mXlbdheldl`Xh
-nnoremap ds{ mXF{dlf}dl`Xh
-nnoremap ds[ mXF[dlf]dl`Xh
-nnoremap ds( mXF(dlf)dl`Xh
-nnoremap ds< mXF<dlf>dl`Xh
-nnoremap ds" mXF"dlf"dl`Xh
-nnoremap ds' mXF'dlf'dl`Xh
-nnoremap ds` mXF`dlf`dl`Xh
+function! SurroundGetPair(char)
+	if a:char == '{'
+		return '}'
+	elseif a:char == '['
+		return ']'
+	elseif a:char == '('
+		return ')'
+	elseif a:char == '<'
+		return '>'
+	else
+		return a:char
+	endif
+endfunction
+function! SurroundChange()
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXI '
+		execute ':normal! `Xlbh"xpe"zp^dh`X'
+	else
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXF' . comchar . 'r' . char . '`Xf' . SurroundGetPair(comchar) . 'r' . SurroundGetPair(char) . '`Xh'
+	endif
+endfunction
+function! SurroundDelete()
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		execute ':normal! mXlbdheldl`Xh'
+	else
+		let char = nr2char(getchar())
+		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
+	endif
+endfunction
 
-"reload configuration
+nnoremap cs :call SurroundChange()<CR>
+nnoremap ds :call SurroundDelete()<CR>
+
+
+"reload config
 noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+
+"session handling
 nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
@@ -222,7 +251,7 @@ map , <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 map  n <Plug>(easymotion-next)
-map  p <Plug>(easymotion-prev)
+map  N <Plug>(easymotion-prev)
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -259,14 +288,15 @@ nnoremap L <C-W><C-L>
 nnoremap H <C-W><C-H>
 
 "buffer navigation
-nnoremap <Leader>b :ls<CR>:b<space>
+nnoremap <Leader>b :ls<CR>:sb<space>
 nnoremap <Leader><tab> :b#<CR>
+noremap <Leader>d :ls<CR>:bd<space>
  
 "marker navigation
 nnoremap <Leader>m :<C-u>marks<CR>:normal! `
  
 "vim tab switcher
-nnoremap <Leader>t :tabe<CR>:TabooRename<space>
+nnoremap <Leader>t :tabe<CR>
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
