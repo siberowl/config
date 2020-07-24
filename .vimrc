@@ -8,7 +8,6 @@
 call plug#begin('~/.vim/plugged')
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'rhysd/vim-clang-format'
-Plug 'psf/black'
 Plug 'funorpain/vim-cpplint'
 Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
@@ -17,6 +16,7 @@ Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
+Plug 'easymotion/vim-easymotion'
 call plug#end()
 
 
@@ -33,6 +33,10 @@ colo corvine_light
 let g:lightline = {
       \ 'colorscheme': 'selenized_light',
       \ }
+let g:lightline.enable = {
+            \ 'statusline': 1,
+            \ 'tabline': 1 
+            \ }
 
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
@@ -69,8 +73,12 @@ set cursorline
 "show status line
 set laststatus=2
 
+"show tabline
+set showtabline=2
+
 "highlight searched word
-set hlsearch
+set hlsearch!
+set nohlsearch
 
 "show autocomplete options on tab
 set wildmenu
@@ -81,10 +89,36 @@ set title
 "scrolling
 set scrolloff=999
 
+"turn off swap
+set noswapfile
+
 "window splitting
 set splitbelow
 set splitright
 
+"set autoindent
+set autoindent
+set smartindent
+
+"Set backspace behavior
+set backspace=indent,eol,start
+
+"netrw settings
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+
+"Disable save warning
+set hidden
+
+"Automatically set directory to current file
+autocmd BufEnter * silent! lcd %:p:h
+
+"Do not store globals and lobal values in a session
+set ssop-=options    
+set ssop-=globals
+
+"Use tabs for buffer switching
+set switchbuf=usetab
 
 "=============================================================
 "Mappings
@@ -99,29 +133,29 @@ set splitright
 "Set leader
 let mapleader = (' ')
 
-"reload configuration
-noremap <F1> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+"Map semiclon
+nnoremap ; :
 
 "Esc mapping
 inoremap jj <Esc>
 
 "Open vimrc
-noremap <Leader>v :tabe ~/.vimrc<CR>
+noremap <F6> :tabe ~/.vimrc<CR>
 
 "yanking file *
 noremap <Leader>y mXggVGy`X
 
-"clear line(delete but keep the empty line)
-noremap <Leader>dd ddO<Esc>
-
 "turn off highlighting in normal mode
-noremap <Leader>h :nohlsearch<CR>:echo<CR>
+nnoremap <Leader>h :nohlsearch<CR>:echo<CR>
 
-"Two spacebars to save
+"Save
 noremap <Leader><Leader> :w<CR>
 
 "copyright message
 inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
+
+"Quit
+noremap <Leader>w :q<CR>
 
 "mapping start and end
 noremap <Leader>. $
@@ -131,17 +165,25 @@ noremap <Leader>, ^
 nnoremap j gj
 nnoremap k gk
 
+"print registers
+nnoremap <Leader>r :registers<CR>
+
+"list buffers
+nnoremap <Leader>l :BLines<CR>
+
+"cd
+nnoremap <Leader>c :cd <C-d>
+
+"macro shortcut
+nnoremap Q @q
+vnoremap Q :norm @q<CR>
+
 "Disable arrow keys in non-insert mode
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Right> <Nop>
 noremap <Left> <Nop>
 
-"Mapping arrow keys in insert mode
-inoremap <C-h> <left>
-inoremap <C-j> <down>
-inoremap <C-k> <up>
-inoremap <C-l> <right>
 
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
@@ -149,20 +191,70 @@ inoremap {<CR>  {<CR>}<Esc>O
 inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
 
-"split navigation
-noremap <C-J> <C-W><C-J>
-noremap <C-K> <C-W><C-K>
-noremap <C-L> <C-W><C-L>
-noremap <C-H> <C-W><C-H>
-
 "surround commands
-nnoremap csw{ mXbi{<esc>wea}<esc>`X
-nnoremap csw[ mXbi[<esc>wea]<esc>`X
-nnoremap csw( mXbi(<esc>wea)<esc>`X
-nnoremap csw< mXbi<<esc>wea><esc>`X
-nnoremap csw" mXbi"<esc>wea"<esc>`X
-nnoremap csw' mXbi'<esc>wea'<esc>`X
-nnoremap dsw mXbdheldl`Xh
+function! SurroundGetPair(char)
+	if a:char == '{'
+		return '}'
+	elseif a:char == '['
+		return ']'
+	elseif a:char == '('
+		return ')'
+	elseif a:char == '<'
+		return '>'
+	else
+		return a:char
+	endif
+endfunction
+function! SurroundChange()
+	echo ''
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXI '
+		execute ':normal! `Xlbh"xpe"zp^dh`X'
+	else
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXF' . comchar . 'r' . char . '`Xf' . SurroundGetPair(comchar) . 'r' . SurroundGetPair(char) . '`Xh'
+	endif
+	echo ''
+endfunction
+function! SurroundDelete()
+	echo ''
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		execute ':normal! mXlbdheldl`Xh'
+	else
+		let char = nr2char(getchar())
+		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
+	endif
+	echo ''
+endfunction
+
+nnoremap cs :call SurroundChange()<CR>
+nnoremap ds :call SurroundDelete()<CR>
+
+
+"reload config
+noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+
+"session handling
+nnoremap <Leader>=s :SaveSession<CR>
+nnoremap <Leader>=q :QuitSession<CR>
+nnoremap <Leader>=r :RestoreSession<CR>
+command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
+command! QuitSession execute ':mks! ~/.vim/sessions/default | :wqa'
+command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
+
+"EasyMotion setup
+map , <Plug>(easymotion-prefix)
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+map  n <Plug>(easymotion-next)
+map  N <Plug>(easymotion-prev)
 
 "global search and replace
 "(use %s/pattern/replacement/ for current file)
@@ -180,28 +272,31 @@ function! FindReplace(pattern, replacement)
 	call Find(a:replacement)
 endfunction
 
-"scrolling
-noremap <Leader>s :call SwitchScroll()<CR> 
-let s:freeze = "on"
-function! SwitchScroll()
-	if s:freeze == "on"
-		echom "turning off centering"
-		set scrolloff=0
-		let s:freeze = "off"
-	else
-		echom "turning on centering"
-		set scrolloff=999
-		let s:freeze = "on"
-	endif
-endfunction
-noremap <s-j> jjj
-noremap <s-k> kkk
-noremap <s-h> hhh
-noremap <s-l> lll
+"Explorer
+nnoremap <Leader>e :Explore<CR>
 
+"Split view
+nnoremap <Leader>vo :only<CR>
+nnoremap <Leader>vs :vs <C-d>
+nnoremap <Leader>vv :vs<CR>:Explore<CR>
+nnoremap <Leader>vh :sp<CR>:Explore<CR>
+
+"window navigation
+nnoremap J <C-W><C-J>
+nnoremap K <C-W><C-K>
+nnoremap L <C-W><C-L>
+nnoremap H <C-W><C-H>
+
+"buffer navigation
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader><tab> :b#<CR>
+noremap <Leader>d :ls<CR>:bd<space>
+ 
+"marker navigation
+nnoremap <Leader>m :<C-u>marks<CR>:normal! `
+ 
 "vim tab switcher
-noremap <s-t> :tabe <C-d>
-noremap <s-w> :q<Bar>:echo<CR>
+nnoremap <Leader>t :tabe<CR>:Explore<CR>
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
@@ -216,10 +311,10 @@ function! TabRight()
       execute "tabm +1"
    endif
 endfunction
-noremap } :tabn<CR>
-noremap { :tabp<CR>
-noremap ) :call TabRight()<CR>
-noremap ( :call TabLeft()<CR>
+nnoremap <C-l> :tabn<CR>
+nnoremap <C-h> :tabp<CR>
+nnoremap ) :call TabRight()<CR>
+nnoremap ( :call TabLeft()<CR>
 
 
 "====================================================================================
@@ -253,9 +348,9 @@ augroup filetype_py
   :autocmd FileType python,py noremap <C-/> A# <Esc>
 augroup end
 
-augroup filetype_xml
+augroup filetype_json
 	autocmd!
-"	autocmd BufWritePost *.html execute ':Autoformat'
+	:autocmd BufWritePost *.json execute ':%!jq .'
 augroup end
 let g:syntastic_python_flake8_exec = 'flake8'
 let g:syntastic_python_checkers = ['flake8']
