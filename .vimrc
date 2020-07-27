@@ -64,11 +64,14 @@ endif
 "show line numbers
 set number
 
-"show vertical cursor line
-set cursorcolumn
-
-"show horizontal cursor line
-set cursorline
+"show cursor line
+augroup BgHighlight
+	autocmd!
+	autocmd WinEnter * set cuc
+	autocmd WinEnter * set cul
+	autocmd WinLeave * set nocuc
+	autocmd WinLeave * set nocul
+augroup END
 
 "show status line
 set laststatus=2
@@ -170,6 +173,7 @@ nnoremap <Leader>r :registers<CR>
 
 "list buffers
 nnoremap <Leader>l :BLines<CR>
+nnoremap <Leader>L :Lines<CR>
 
 "cd
 nnoremap <Leader>c :cd <C-d>
@@ -246,7 +250,7 @@ nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
 command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
-command! QuitSession execute ':mks! ~/.vim/sessions/default | :wqa'
+command! QuitSession execute ':mks! ~/.vim/sessions/default | :qa'
 command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
 
 "EasyMotion setup
@@ -275,12 +279,27 @@ endfunction
 "Explorer
 nnoremap <Leader>e :Explore<CR>
 
-"Split view
-nnoremap <Leader>vo :only<CR>
-nnoremap <Leader>vs :vs <C-d>
+"Window split view
+nnoremap <Leader>vo :call MaximizeToggle()<CR>
+nnoremap <Leader>vr :sview<CR>
 nnoremap <Leader>vv :vs<CR>:Explore<CR>
+nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
 nnoremap <Leader>vh :sp<CR>:Explore<CR>
+nnoremap <Leader>vH :botright split<CR>:Explore<CR>
 
+function! MaximizeToggle()
+	if exists("g:full_screened")
+		echo "returning to normal"
+		execute "normal! \<C-W>\="
+		call delete(g:full_screened)
+		unlet g:full_screened
+	else
+		echo "full screening"
+		execute "normal! \<C-W>\_"
+		execute "normal! \<C-W>\|"
+		let g:full_screened=tempname()
+	endif
+endfunction
 "window navigation
 nnoremap J <C-W><C-J>
 nnoremap K <C-W><C-K>
