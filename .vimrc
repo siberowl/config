@@ -1,9 +1,9 @@
-"=============================================================
+"====================================================================================
 "Plugins
 "
 "Concept:
 "Using vim/plugged for installation.
-"=============================================================
+"====================================================================================
 
 call plug#begin('~/.vim/plugged')
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
@@ -18,14 +18,16 @@ Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'easymotion/vim-easymotion'
 call plug#end()
+"====================================================================================
 
 
-"=============================================================
+
+"====================================================================================
 "Settings
 "
 "Concept:
 "Solarized theme and line centering.
-"=============================================================
+"====================================================================================
 
 "colorscheme
 set termguicolors
@@ -67,11 +69,20 @@ set number
 "show cursor line
 augroup BgHighlight
 	autocmd!
-	autocmd WinEnter * set cuc
-	autocmd WinEnter * set cul
-	autocmd WinLeave * set nocuc
-	autocmd WinLeave * set nocul
+	autocmd WinEnter * call OnWindowEnter()
+	autocmd WinLeave * call OnWindowLeave()
 augroup END
+
+function! OnWindowEnter()
+	hi CursorLine gui=underline cterm=underline
+	set cuc
+	set cul
+endfunction
+	
+function! OnWindowLeave()
+	set nocuc
+	set nocul
+endfunction
 
 "show status line
 set laststatus=2
@@ -94,10 +105,6 @@ set scrolloff=999
 
 "turn off swap
 set noswapfile
-
-"window splitting
-set splitbelow
-set splitright
 
 "set autoindent
 set autoindent
@@ -123,7 +130,29 @@ set ssop-=globals
 "Use tabs for buffer switching
 set switchbuf=usetab
 
-"=============================================================
+"window splitting
+set splitbelow
+set splitright
+
+"====================================================================================
+
+
+
+"====================================================================================
+"Function sourcing
+"====================================================================================
+
+source ~/.vim/plugins/minimal-find-replace.vim
+source ~/.vim/plugins/minimal-session.vim
+source ~/.vim/plugins/minimal-split-tools.vim
+source ~/.vim/plugins/minimal-surround.vim
+source ~/.vim/plugins/minimal-tabswitcher.vim
+
+"====================================================================================
+
+
+
+"====================================================================================
 "Mappings
 "
 "Concept:
@@ -131,7 +160,11 @@ set switchbuf=usetab
 "For actions likely to be repeated, Shift+key is mapped.
 "
 "Maps that use marker 'X' to keep current position have a *.
-"=============================================================
+"====================================================================================
+
+
+"Essentials
+"-----------------------------------------------------
 
 "Set leader
 let mapleader = (' ')
@@ -142,51 +175,113 @@ nnoremap ; :
 "Esc mapping
 inoremap jj <Esc>
 
+"reload config
+noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+
 "Open vimrc
 noremap <F6> :tabe ~/.vimrc<CR>
-
-"yanking file *
-noremap <Leader>y mXggVGy`X
-
-"turn off highlighting in normal mode
-nnoremap <Leader>h :nohlsearch<CR>:echo<CR>
 
 "Save
 noremap <Leader><Leader> :w<CR>
 
-"copyright message
-inoremap copyright // Copyright 2020 <CoLab Co., Ltd.>
-
 "Quit
 noremap <Leader>w :q<CR>
 
-"mapping start and end
-noremap <Leader>. $
-noremap <Leader>, ^
+"session handling
+nnoremap <Leader>=s :SaveSession<CR>
+nnoremap <Leader>=q :QuitSession<CR>
+nnoremap <Leader>=r :RestoreSession<CR>
 
-"allow up and down for wrapped line
-nnoremap j gj
-nnoremap k gk
+"-----------------------------------------------------
 
-"print registers
-nnoremap <Leader>r :registers<CR>
+
+"Abbreviated listing commands
+"-----------------------------------------------------
+
+"cd
+nnoremap <Leader>c :cd <C-d>
+
+"buffer navigation
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader><tab> :b#<CR>
+
+"marker navigation
+nnoremap <Leader>m :<C-u>marks<CR>:normal! `
 
 "list buffers
 nnoremap <Leader>l :BLines<CR>
 nnoremap <Leader>L :Lines<CR>
 
-"cd
-nnoremap <Leader>c :cd <C-d>
+"print registers
+nnoremap <Leader>r :registers<CR>
 
-"macro shortcut
-nnoremap Q @q
-vnoremap Q :norm @q<CR>
+"-----------------------------------------------------
+
+
+"Navigation
+"-----------------------------------------------------
+
+"window navigation
+nnoremap J <C-W><C-J>
+nnoremap K <C-W><C-K>
+nnoremap L <C-W><C-L>
+nnoremap H <C-W><C-H>
+
+"EasyMotion setup
+map , <Plug>(easymotion-prefix)
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+map  n <Plug>(easymotion-next)
+map  N <Plug>(easymotion-prev)
 
 "Disable arrow keys in non-insert mode
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Right> <Nop>
 noremap <Left> <Nop>
+
+"allow up and down for wrapped line
+nnoremap j gj
+nnoremap k gk
+
+"mapping start and end
+noremap <Leader>. $
+noremap <Leader>, ^
+ 
+"vim tab switcher
+nnoremap <C-l> :tabn<CR>
+nnoremap <C-h> :tabp<CR>
+nnoremap ) :call TabRight()<CR>
+nnoremap ( :call TabLeft()<CR>
+
+"-----------------------------------------------------
+
+
+"Exploration
+"-----------------------------------------------------
+
+"Explorer
+nnoremap <Leader>e :Explore<CR>
+
+"New tab
+nnoremap <Leader>t :tabe<CR>:Explore<CR>
+
+"New splits
+nnoremap <Leader>vo :call MaximizeToggle()<CR>
+nnoremap <Leader>vv :vs<CR>:Explore<CR>
+nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
+nnoremap <Leader>vh :sp<CR>:Explore<CR>
+nnoremap <Leader>vH :botright split<CR>:Explore<CR>
+
+"-----------------------------------------------------
+
+
+"Edits
+"-----------------------------------------------------
+
+"macro shortcut
+nnoremap Q @q
+vnoremap Q :norm @q<CR>
 
 
 "Bracket auto-completes
@@ -196,144 +291,15 @@ inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
 
 "surround commands
-function! SurroundGetPair(char)
-	if a:char == '{'
-		return '}'
-	elseif a:char == '['
-		return ']'
-	elseif a:char == '('
-		return ')'
-	elseif a:char == '<'
-		return '>'
-	else
-		return a:char
-	endif
-endfunction
-function! SurroundChange()
-	echo ''
-	let comchar = nr2char(getchar())
-	if comchar == 'w'
-		let char = nr2char(getchar())
-		let @x = char 
-		let @z = SurroundGetPair(char)
-		execute ':normal! mXI '
-		execute ':normal! `Xlbh"xpe"zp^dh`X'
-	else
-		let char = nr2char(getchar())
-		let @x = char 
-		let @z = SurroundGetPair(char)
-		execute ':normal! mXF' . comchar . 'r' . char . '`Xf' . SurroundGetPair(comchar) . 'r' . SurroundGetPair(char) . '`Xh'
-	endif
-	echo ''
-endfunction
-function! SurroundDelete()
-	echo ''
-	let comchar = nr2char(getchar())
-	if comchar == 'w'
-		execute ':normal! mXlbdheldl`Xh'
-	else
-		let char = nr2char(getchar())
-		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
-	endif
-	echo ''
-endfunction
+nnoremap cs :call ChangeSurround()<CR>
+nnoremap ds :call DeleteSurround()<CR>
 
-nnoremap cs :call SurroundChange()<CR>
-nnoremap ds :call SurroundDelete()<CR>
+"yanking file *
+noremap <Leader>y mXggVGy`X
 
+"-----------------------------------------------------
+"====================================================================================
 
-"reload config
-noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
-
-"session handling
-nnoremap <Leader>=s :SaveSession<CR>
-nnoremap <Leader>=q :QuitSession<CR>
-nnoremap <Leader>=r :RestoreSession<CR>
-command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
-command! QuitSession execute ':mks! ~/.vim/sessions/default | :qa'
-command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
-
-"EasyMotion setup
-map , <Plug>(easymotion-prefix)
-map  / <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
-map  n <Plug>(easymotion-next)
-map  N <Plug>(easymotion-prev)
-
-"global search and replace
-"(use %s/pattern/replacement/ for current file)
-command! -nargs=1 Find call Find(<f-args>)
-command! -nargs=* FindReplace call FindReplace(<f-args>)
-function! Find(pattern)
-	execute ':Rg ' . a:pattern
-endfunction
-function! FindReplace(pattern, replacement)
-	execute ':w'
-	call Find(a:pattern)
-	execute ':!(find . -name ''*.cpp'' -o -name ''*.h'' -o -name ''*.py'' -o -name ''*.js'' | xargs sed -i ''s/' . a:pattern . '/'. a:replacement . '/g'')'
-	execute 'normal /<C-l><CR>'
-	execute ':e'
-	call Find(a:replacement)
-endfunction
-
-"Explorer
-nnoremap <Leader>e :Explore<CR>
-
-"Window split view
-nnoremap <Leader>vo :call MaximizeToggle()<CR>
-nnoremap <Leader>vr :sview<CR>
-nnoremap <Leader>vv :vs<CR>:Explore<CR>
-nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
-nnoremap <Leader>vh :sp<CR>:Explore<CR>
-nnoremap <Leader>vH :botright split<CR>:Explore<CR>
-
-function! MaximizeToggle()
-	if exists("g:full_screened")
-		echo "returning to normal"
-		execute "normal! \<C-W>\="
-		call delete(g:full_screened)
-		unlet g:full_screened
-	else
-		echo "full screening"
-		execute "normal! \<C-W>\_"
-		execute "normal! \<C-W>\|"
-		let g:full_screened=tempname()
-	endif
-endfunction
-"window navigation
-nnoremap J <C-W><C-J>
-nnoremap K <C-W><C-K>
-nnoremap L <C-W><C-L>
-nnoremap H <C-W><C-H>
-
-"buffer navigation
-nnoremap <Leader>b :Buffers<CR>
-nnoremap <Leader><tab> :b#<CR>
-noremap <Leader>d :ls<CR>:bd<space>
- 
-"marker navigation
-nnoremap <Leader>m :<C-u>marks<CR>:normal! `
- 
-"vim tab switcher
-nnoremap <Leader>t :tabe<CR>:Explore<CR>
-function! TabLeft()
-   if tabpagenr() == 1
-      execute "tabm"
-   else
-      execute "tabm -1"
-   endif
-endfunction
-function! TabRight()
-   if tabpagenr() == tabpagenr('$')
-      execute "tabm" 0
-   else
-      execute "tabm +1"
-   endif
-endfunction
-nnoremap <C-l> :tabn<CR>
-nnoremap <C-h> :tabp<CR>
-nnoremap ) :call TabRight()<CR>
-nnoremap ( :call TabLeft()<CR>
 
 
 "====================================================================================
