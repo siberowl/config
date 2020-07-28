@@ -139,20 +139,6 @@ set splitright
 
 
 "====================================================================================
-"Function sourcing
-"====================================================================================
-
-source ~/.vim/plugins/minimal-find-replace.vim
-source ~/.vim/plugins/minimal-session.vim
-source ~/.vim/plugins/minimal-split-tools.vim
-source ~/.vim/plugins/minimal-surround.vim
-source ~/.vim/plugins/minimal-tabswitcher.vim
-
-"====================================================================================
-
-
-
-"====================================================================================
 "Mappings
 "
 "Concept:
@@ -192,6 +178,10 @@ nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
 
+command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
+command! QuitSession execute ':mks! ~/.vim/sessions/default | :qa'
+command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
+
 "-----------------------------------------------------
 
 
@@ -222,8 +212,8 @@ nnoremap <Leader>r :registers<CR>
 "-----------------------------------------------------
 
 "page up/down
-nnoremap <Leader>d <C-d>
-nnoremap <Leader>u <C-u>
+nnoremap <Leader>j <C-d>
+nnoremap <Leader>k <C-u>
 
 "window navigation
 nnoremap J <C-W><C-J>
@@ -258,6 +248,21 @@ nnoremap <C-h> :tabp<CR>
 nnoremap ) :call TabRight()<CR>
 nnoremap ( :call TabLeft()<CR>
 
+function! TabLeft()
+   if tabpagenr() == 1
+      execute "tabm"
+   else
+      execute "tabm -1"
+   endif
+endfunction
+function! TabRight()
+   if tabpagenr() == tabpagenr('$')
+      execute "tabm" 0
+   else
+      execute "tabm +1"
+   endif
+endfunction
+
 "-----------------------------------------------------
 
 
@@ -276,6 +281,20 @@ nnoremap <Leader>vv :vs<CR>:Explore<CR>
 nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
 nnoremap <Leader>vh :sp<CR>:Explore<CR>
 nnoremap <Leader>vH :botright split<CR>:Explore<CR>
+
+function! MaximizeToggle()
+	if exists("g:full_screened")
+		echo "returning to normal"
+		execute "normal! \<C-W>\="
+		call delete(g:full_screened)
+		unlet g:full_screened
+	else
+		echo "full screening"
+		execute "normal! \<C-W>\_"
+		execute "normal! \<C-W>\|"
+		let g:full_screened=tempname()
+	endif
+endfunction
 
 "-----------------------------------------------------
 
@@ -298,8 +317,69 @@ inoremap (<CR>  (<CR>)<Esc>O
 nnoremap cs :call ChangeSurround()<CR>
 nnoremap ds :call DeleteSurround()<CR>
 
+function! SurroundGetPair(char)
+	if a:char == '{'
+		return '}'
+	elseif a:char == '['
+		return ']'
+	elseif a:char == '('
+		return ')'
+	elseif a:char == '<'
+		return '>'
+	else
+		return a:char
+	endif
+endfunction
+function! ChangeSurround()
+	echo ''
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXI '
+		execute ':normal! `Xlbh"xpe"zp^dh`X'
+	else
+		let char = nr2char(getchar())
+		let @x = char 
+		let @z = SurroundGetPair(char)
+		execute ':normal! mXF' . comchar . 'r' . char . '`Xf' . SurroundGetPair(comchar) . 'r' . SurroundGetPair(char) . '`Xh'
+	endif
+	echo ''
+endfunction
+function! DeleteSurround()
+	echo ''
+	let comchar = nr2char(getchar())
+	if comchar == 'w'
+		execute ':normal! mXlbdheldl`Xh'
+	else
+		let char = nr2char(getchar())
+		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
+	endif
+	echo ''
+endfunction
+
 "yanking file *
 noremap <Leader>y mXggVGy`X
+
+"global search and replace
+"(use %s/pattern/replacement/ for current file)
+nnoremap <Leader>F :call Find<space>
+nnoremap <Leader>R :call FindReplace<space>
+
+command! -nargs=1 Find call Find(<f-args>)
+command! -nargs=* FindReplace call FindReplace(<f-args>)
+function! Find(pattern)
+	execute ':Rg ' . a:pattern
+endfunction
+function! FindReplace(pattern, replacement)
+	execute ':w'
+	call Find(a:pattern)
+	execute ':!(find . -name ''*.cpp'' -o -name ''*.h'' -o -name ''*.py'' -o -name ''*.js'' | xargs sed -i ''s/' . a:pattern . '/'. a:replacement . '/g'')'
+	execute 'normal /<C-l><CR>'
+	execute ':e'
+	call Find(a:replacement)
+endfunction
 
 "-----------------------------------------------------
 "====================================================================================
