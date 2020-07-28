@@ -1,3 +1,4 @@
+"// {{{ Plugins: using plugged
 "====================================================================================
 "Plugins
 "
@@ -19,9 +20,9 @@ Plug 'itchyny/lightline.vim'
 Plug 'easymotion/vim-easymotion'
 call plug#end()
 "====================================================================================
+"// }}}
 
-
-
+"// {{{ Settings: theme and default settings
 "====================================================================================
 "Settings
 "
@@ -134,10 +135,13 @@ set switchbuf=usetab
 set splitbelow
 set splitright
 
+"marker folding
+set foldmethod=marker
+
 "====================================================================================
+"//}}}
 
-
-
+"// {{{ Mappings
 "====================================================================================
 "Mappings
 "
@@ -149,7 +153,7 @@ set splitright
 "====================================================================================
 
 
-"Essentials
+"// {{{ Essentials
 "-----------------------------------------------------
 
 "Set leader
@@ -182,40 +186,54 @@ command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved sess
 command! QuitSession execute ':mks! ~/.vim/sessions/default | :qa'
 command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
 
+"Disable arrow keys in non-insert mode
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Right> <Nop>
+noremap <Left> <Nop>
+
+
 "-----------------------------------------------------
+"// }}}
 
 
-"Abbreviated listing commands
+"// {{{ Miscellaneous
 "-----------------------------------------------------
-
-"cd
-nnoremap <Leader>c :cd <C-d>
-
-"buffer navigation
-nnoremap <Leader>b :Buffers<CR>
-nnoremap <Leader><tab> :b#<CR>
-
-"marker navigation
-nnoremap <Leader>m :<C-u>marks<CR>:normal! `
-
-"list buffers
-nnoremap <Leader>l :BLines<CR>
-nnoremap <Leader>L :Lines<CR>
 
 "print registers
 nnoremap <Leader>r :registers<CR>
 
+"Folding
+nnoremap <Leader>f za
+
+"cd
+nnoremap <Leader>c :cd <C-d>
+
+"-----------------------------------------------------
+"// }}}
+
+
+"// {{{ Navigation
 "-----------------------------------------------------
 
+"Jump to fuzzy searched buffer (fzf)
+nnoremap <Leader>b :Buffers<CR>
 
-"Navigation
-"-----------------------------------------------------
+"Open previous buffer
+nnoremap <Leader><tab> :b#<CR>
 
-"page up/down
+"List and jump to marker
+nnoremap <Leader>m :<C-u>marks<CR>:normal! `
+
+"Jump to fuzzy searched line (fzf)
+nnoremap <Leader>l :BLines<CR>
+nnoremap <Leader>L :Lines<CR>
+
+"Page up/down
 nnoremap <Leader>j <C-d>
 nnoremap <Leader>k <C-u>
 
-"window navigation
+"Window navigation
 nnoremap J <C-W><C-J>
 nnoremap K <C-W><C-K>
 nnoremap L <C-W><C-L>
@@ -227,12 +245,6 @@ map  / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 map  n <Plug>(easymotion-next)
 map  N <Plug>(easymotion-prev)
-
-"Disable arrow keys in non-insert mode
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Right> <Nop>
-noremap <Left> <Nop>
 
 "allow up and down for wrapped line
 nnoremap j gj
@@ -247,7 +259,7 @@ nnoremap <C-l> :tabn<CR>
 nnoremap <C-h> :tabp<CR>
 nnoremap ) :call TabRight()<CR>
 nnoremap ( :call TabLeft()<CR>
-
+"// {{{ Tab functions
 function! TabLeft()
    if tabpagenr() == 1
       execute "tabm"
@@ -262,11 +274,13 @@ function! TabRight()
       execute "tabm +1"
    endif
 endfunction
+"// }}}
 
 "-----------------------------------------------------
+"// }}}
 
 
-"Exploration
+"// {{{ Exploration
 "-----------------------------------------------------
 
 "Explorer
@@ -281,7 +295,7 @@ nnoremap <Leader>vv :vs<CR>:Explore<CR>
 nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
 nnoremap <Leader>vh :sp<CR>:Explore<CR>
 nnoremap <Leader>vH :botright split<CR>:Explore<CR>
-
+"// {{{ MaximizeToggle()
 function! MaximizeToggle()
 	if exists("g:full_screened")
 		echo "returning to normal"
@@ -295,11 +309,13 @@ function! MaximizeToggle()
 		let g:full_screened=tempname()
 	endif
 endfunction
+"// }}}
 
 "-----------------------------------------------------
+"// }}}
 
 
-"Edits
+"// {{{ Edits
 "-----------------------------------------------------
 
 "macro shortcut
@@ -316,7 +332,7 @@ inoremap (<CR>  (<CR>)<Esc>O
 "surround commands
 nnoremap cs :call ChangeSurround()<CR>
 nnoremap ds :call DeleteSurround()<CR>
-
+"// {{{ Surround functions
 function! SurroundGetPair(char)
 	if a:char == '{'
 		return '}'
@@ -358,6 +374,7 @@ function! DeleteSurround()
 	endif
 	echo ''
 endfunction
+"// }}}
 
 "yanking file *
 noremap <Leader>y mXggVGy`X
@@ -366,7 +383,7 @@ noremap <Leader>y mXggVGy`X
 "(use %s/pattern/replacement/ for current file)
 nnoremap <Leader>F :call Find<space>
 nnoremap <Leader>R :call FindReplace<space>
-
+"// {{{ search and replace functions
 command! -nargs=1 Find call Find(<f-args>)
 command! -nargs=* FindReplace call FindReplace(<f-args>)
 function! Find(pattern)
@@ -380,12 +397,16 @@ function! FindReplace(pattern, replacement)
 	execute ':e'
 	call Find(a:replacement)
 endfunction
+"// }}}
 
 "-----------------------------------------------------
+"// }}}
+
+
 "====================================================================================
+"// }}}
 
-
-
+"// {{{ Formatters and linters
 "====================================================================================
 "Formatting
 "
@@ -424,3 +445,4 @@ augroup end
 let g:syntastic_python_flake8_exec = 'flake8'
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args = '--ignore="E203, E501"'
+"// }}}
