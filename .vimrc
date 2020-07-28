@@ -221,6 +221,10 @@ nnoremap <Leader>r :registers<CR>
 "Navigation
 "-----------------------------------------------------
 
+"page up/down
+nnoremap <Leader>d <C-d>
+nnoremap <Leader>u <C-u>
+
 "window navigation
 nnoremap J <C-W><C-J>
 nnoremap K <C-W><C-K>
