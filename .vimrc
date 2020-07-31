@@ -1,3 +1,4 @@
+"Author: siberowl
 "// {{{ Plugins: using plugged
 "====================================================================================
 "Plugins
@@ -10,7 +11,6 @@ call plug#begin('~/.vim/plugged')
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'rhysd/vim-clang-format'
 Plug 'funorpain/vim-cpplint'
-Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'dense-analysis/ale'
@@ -18,6 +18,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'easymotion/vim-easymotion'
+Plug 'mbbill/undotree'
 call plug#end()
 "====================================================================================
 "// }}}
@@ -79,11 +80,26 @@ function! OnWindowEnter()
 	set cuc
 	set cul
 endfunction
-	
+
 function! OnWindowLeave()
 	set nocuc
 	set nocul
 endfunction
+
+function! Pulse() "// {{{ Pulse function
+	let current_window = winnr()
+	let start = 0
+	let end = winwidth(current_window)
+	let step  = end/30
+	hi ColorColumn guibg=#FFFFFF
+	for i in range(start, end, step)
+		redraw
+		execute "set colorcolumn=" . i
+		sleep 1m
+	endfor
+	set colorcolumn=0
+endfunction
+"// }}}
 
 "show status line
 set laststatus=2
@@ -106,10 +122,6 @@ set scrolloff=999
 
 "turn off swap
 set noswapfile
-
-"set autoindent
-set autoindent
-set smartindent
 
 "Set backspace behavior
 set backspace=indent,eol,start
@@ -138,10 +150,13 @@ set splitright
 "marker folding
 set foldmethod=marker
 
+set nobackup
+set nowritebackup
+
 "====================================================================================
 "//}}}
 
-"// {{{ Mappings
+"// {{{ Key mappings
 "====================================================================================
 "Mappings
 "
@@ -201,13 +216,16 @@ noremap <Left> <Nop>
 "-----------------------------------------------------
 
 "print registers
-nnoremap <Leader>r :registers<CR>
+nnoremap <Leader>r :registers<CR>:normal! "
 
 "Folding
 nnoremap <Leader>f za
 
 "cd
 nnoremap <Leader>c :cd <C-d>
+
+"Toggle undo tree
+nnoremap <Leader>u :UndotreeToggle<CR>
 
 "-----------------------------------------------------
 "// }}}
@@ -291,10 +309,10 @@ nnoremap <Leader>t :tabe<CR>:Explore<CR>
 
 "New splits
 nnoremap <Leader>vo :call MaximizeToggle()<CR>
-nnoremap <Leader>vv :vs<CR>:Explore<CR>
-nnoremap <Leader>vV :vert botright split<CR>:Explore<CR>
-nnoremap <Leader>vh :sp<CR>:Explore<CR>
-nnoremap <Leader>vH :botright split<CR>:Explore<CR>
+nnoremap <Leader>vv :vs<CR><C-w>=:Explore<CR>
+nnoremap <Leader>vV :vert botright split<CR><C-w>=:Explore<CR>
+nnoremap <Leader>vh :sp<CR><C-w>=:Explore<CR>
+nnoremap <Leader>vH :botright split<CR><C-w>=:Explore<CR>
 "// {{{ MaximizeToggle()
 function! MaximizeToggle()
 	if exists("g:full_screened")
@@ -322,12 +340,15 @@ endfunction
 nnoremap Q @q
 vnoremap Q :norm @q<CR>
 
+"autocomplete with tab
+inoremap <tab> <C-n>
 
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
 inoremap {<CR>  {<CR>}<Esc>O
 inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
+
 
 "surround commands
 nnoremap cs :call ChangeSurround()<CR>
@@ -353,8 +374,7 @@ function! ChangeSurround()
 		let char = nr2char(getchar())
 		let @x = char 
 		let @z = SurroundGetPair(char)
-		execute ':normal! mXI '
-		execute ':normal! `Xlbh"xpe"zp^dh`X'
+		execute ':normal! mXlbh"xpe"zp`X'
 	else
 		let char = nr2char(getchar())
 		let @x = char 
@@ -415,27 +435,23 @@ endfunction
 "====================================================================================
 
 augroup filetype_c
-  autocmd!
-  :autocmd FileType c,cpp,h setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
-  :autocmd FileType c,cpp,h ClangFormatAutoEnable
-  :autocmd FileType c,cpp,h  noremap <C-/> // <Esc>
+	autocmd!
+	:autocmd FileType c,cpp,h setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
+	:autocmd BufWritePost *.c,*.cpp,*.h execute ':ClangFormat'
 augroup end
 let g:syntastic_cpp_cpplint_exec = 'cpplint'
 let g:syntastic_cpp_checkers = ['cpplint']
 
 augroup filetype_js
-  autocmd!
-  :autocmd BufWritePost *.js execute ':PrettierAsync'
-  :autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-  :autocmd FileType javascript noremap <C-/> // <Esc>
+	autocmd!
+	:autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+	:autocmd BufWritePost *.js execute ':PrettierAsync'
 augroup end
-"let g:prettier#config#parser = 'babylon'
 
 augroup filetype_py
-  autocmd!
-  :autocmd BufWritePost *.py execute ':Black' 
-  :autocmd FileType python,py setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-  :autocmd FileType python,py noremap <C-/> A# <Esc>
+	autocmd!
+	:autocmd BufWritePost *.py execute ':Black' 
+	:autocmd FileType python,py setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 augroup end
 
 augroup filetype_json
