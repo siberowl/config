@@ -11,6 +11,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'rhysd/vim-clang-format'
 Plug 'funorpain/vim-cpplint'
+Plug 'psf/black'
 Plug 'nvie/vim-flake8'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'dense-analysis/ale'
@@ -147,11 +148,20 @@ set switchbuf=usetab
 set splitbelow
 set splitright
 
-"marker folding
-set foldmethod=marker
+"update file automatically on change
+set autoread
 
-set nobackup
-set nowritebackup
+"set project directory
+autocmd VimEnter * call OnEnter()
+function! OnEnter()
+	let curr_dir = getcwd()
+	let g:session_name = substitute(curr_dir, '\/', '-', 'g')
+	let g:branch_name = system('git rev-parse --abbrev-ref HEAD')
+	if v:shell_error !=0
+	else
+		let g:session_name = g:session_name . '-' . substitute(g:branch_name, '\/', '-', 'g')
+	endif
+endfunction
 
 "====================================================================================
 "//}}}
@@ -197,16 +207,15 @@ nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
 
-command! SaveSession execute ':mks! ~/.vim/sessions/default | echom ''Saved session!'''
-command! QuitSession execute ':mks! ~/.vim/sessions/default | :qa'
-command! RestoreSession execute ':source ~/.vim/sessions/default | noh | echom ''Restored session!'''
+command! SaveSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | echom ''Saved session as default'. g:session_name .''''
+command! QuitSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | :qa'
+command! RestoreSession execute ':source ~/.vim/sessions/default' . g:session_name . ' | noh | echom ''Restored session default'. g:session_name .''''
 
 "Disable arrow keys in non-insert mode
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Right> <Nop>
 noremap <Left> <Nop>
-
 
 "-----------------------------------------------------
 "// }}}
