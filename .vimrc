@@ -353,13 +353,13 @@ endfunction
 nnoremap Q @q
 vnoremap Q :norm @q<CR>
 
+"multi-cursor macros
 nnoremap <CR> :call AddCursor()<CR>
 nnoremap <Leader><CR> :call ApplyCursorRecording()<CR>
 nnoremap <Delete> :call PurgeCursors()<CR>:echo "Purged all cursors"<CR>
-
 "// {{{ Cursor functions
 
-let s:cursor_register = ''
+call PurgeCursors()
 function! AddCursor()
 	if exists("s:custom_cursors")
 		let l:ncursors = len(s:custom_cursors)
@@ -371,6 +371,7 @@ function! AddCursor()
 	if s:cursor_register == ''
 		echo "Macro register for this cursor: "
 		let s:cursor_register = nr2char(getchar())
+		let s:initial_changenr = changenr()
 	endif
 
 	if l:ncursors != 0
@@ -382,13 +383,31 @@ function! AddCursor()
 		execute "normal! q" . s:cursor_register
 	endif
 
-	let s:custom_cursors = s:custom_cursors + [getcurpos()]
-	return s:custom_cursors[l:ncursors]
+	let l:curpos = getcurpos()
+	call InsertCursor2Array(l:curpos)
+
+endfunction
+
+function! InsertCursor2Array(curpos)
+	"let s:custom_cursors = s:custom_cursors + [a:curpos]
+	
+	if len(s:custom_cursors) == 0
+		call add(s:custom_cursors, a:curpos)
+	else	
+		for i in range(len(s:custom_cursors))
+			if s:custom_cursors[i][2] < a:curpos[2]
+				call insert(s:custom_cursors, a:curpos, i)
+				return
+			endif
+		endfor
+		call add(s:custom_cursors, a:curpos)
+	endif
 endfunction
 
 function! PurgeCursors()
 	let s:custom_cursors = []
 	let s:cursor_register = ''
+	let s:initial_changenr = -1
 endfunction
 
 function! GetCursors()
@@ -401,8 +420,12 @@ function! ApplyCursorRecording()
 		echo "No cursors found"
 		return
 	endif
+	let l:nundo = changenr() - s:initial_changenr
+	if l:nundo > 0
+		execute "normal! " . l:nundo . "u"
+	endif
 	let l:macro_char = s:cursor_register
-	let l:napply = len(s:custom_cursors)-1
+	let l:napply = len(s:custom_cursors)
 	for i in range(l:napply)
 		let l:cursor = s:custom_cursors[i]
 		call setpos('.', l:cursor)
@@ -438,6 +461,7 @@ function! SurroundGetPair(char)
 		return a:char
 	endif
 endfunction
+
 function! ChangeSurround()
 	echo ''
 	let comchar = nr2char(getchar())
@@ -460,7 +484,7 @@ function! DeleteSurround()
 	if comchar == 'w'
 		execute ':normal! mXlbdheldl`Xh'
 	else
-		let char = nr2char(getchar())
+		let char = comchar
 		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
 	endif
 	echo ''
