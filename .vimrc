@@ -151,6 +151,9 @@ set splitright
 "update file automatically on change
 set autoread
 
+"set fold
+set foldmethod=marker
+
 "set project directory
 autocmd VimEnter * call OnEnter()
 function! OnEnter()
@@ -206,6 +209,7 @@ noremap <Leader>w :q<CR>
 nnoremap <Leader>=s :SaveSession<CR>
 nnoremap <Leader>=q :QuitSession<CR>
 nnoremap <Leader>=r :RestoreSession<CR>
+nnoremap <Leader>=l :echo system('ls ~/.vim/sessions')<CR>
 
 command! SaveSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | echom ''Saved session as default'. g:session_name .''''
 command! QuitSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | :qa'
@@ -349,8 +353,66 @@ endfunction
 nnoremap Q @q
 vnoremap Q :norm @q<CR>
 
-"autocomplete with tab
-inoremap <tab> <C-n>
+nnoremap <CR> :call AddCursor()<CR>
+nnoremap <Leader><CR> :call ApplyCursorRecording()<CR>
+nnoremap <Delete> :call PurgeCursors()<CR>:echo "Purged all cursors"<CR>
+
+"// {{{ Cursor functions
+
+let s:cursor_register = ''
+function! AddCursor()
+	if exists("s:custom_cursors")
+		let l:ncursors = len(s:custom_cursors)
+	else
+		call PurgeCursors()
+		let l:ncursors = 0
+	endif
+
+	if s:cursor_register == ''
+		echo "Macro register for this cursor: "
+		let s:cursor_register = nr2char(getchar())
+	endif
+
+	if l:ncursors != 0
+		execute "normal! q"
+		echo ' '
+		sleep 30ms
+		execute "normal! q" . s:cursor_register
+	else
+		execute "normal! q" . s:cursor_register
+	endif
+
+	let s:custom_cursors = s:custom_cursors + [getcurpos()]
+	return s:custom_cursors[l:ncursors]
+endfunction
+
+function! PurgeCursors()
+	let s:custom_cursors = []
+	let s:cursor_register = ''
+endfunction
+
+function! GetCursors()
+	return s:custom_cursors
+endfunction
+
+function! ApplyCursorRecording()
+	let l:currpos = getcurpos()
+	if len(s:custom_cursors) == 0
+		echo "No cursors found"
+		return
+	endif
+	let l:macro_char = s:cursor_register
+	let l:napply = len(s:custom_cursors)-1
+	for i in range(l:napply)
+		let l:cursor = s:custom_cursors[i]
+		call setpos('.', l:cursor)
+		execute "normal! @" . l:macro_char
+	endfor
+	echo "Applied macro to " . l:napply . " cursors."
+	call setpos('.', l:currpos)
+	call PurgeCursors()
+endfunction
+"// }}}
 
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
