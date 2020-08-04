@@ -431,7 +431,6 @@ function! ApplyCursorRecording()
 		call setpos('.', l:cursor)
 		execute "normal! @" . l:macro_char
 	endfor
-	echo "Applied macro to " . l:napply . " cursors."
 	call setpos('.', l:currpos)
 	call PurgeCursors()
 endfunction
