@@ -417,7 +417,7 @@ function! AddCursor()
 	augroup CursorGroup
 		autocmd!
 		autocmd TextChangedI * call ApplyCursorChanges()
-		autocmd TextChanged * call ApplyCursorChanges()
+		autocmd TextYankPost * call ApplyCursorChanges()
 	augroup END
 
 	call InsertCursor2Array(l:curpos)
