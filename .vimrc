@@ -355,42 +355,24 @@ vnoremap Q :norm @q<CR>
 
 "multi-cursor macros
 nnoremap <CR> :call AddCursor()<CR>
-nnoremap <Leader><CR> :call ApplyCursorRecording()<CR>
-nnoremap <Delete> :call PurgeCursors()<CR>:echo "Purged all cursors"<CR>
+nnoremap <Delete> :call ResetCursors()<CR>:echo "Reset cursors."<CR>
 "// {{{ Cursor functions
-
-call PurgeCursors()
-function! AddCursor()
-	if exists("s:custom_cursors")
-		let l:ncursors = len(s:custom_cursors)
-	else
-		call PurgeCursors()
-		let l:ncursors = 0
-	endif
-
-	if s:cursor_register == ''
-		echo "Macro register for this cursor: "
-		let s:cursor_register = nr2char(getchar())
-		let s:initial_changenr = changenr()
-	endif
-
-	if l:ncursors != 0
-		execute "normal! q"
-		echo ' '
-		sleep 30ms
-		execute "normal! q" . s:cursor_register
-	else
-		execute "normal! q" . s:cursor_register
-	endif
-
-	let l:curpos = getcurpos()
-	call InsertCursor2Array(l:curpos)
-
+function! ResetCursors()
+	let s:custom_cursors = []
+	let s:initial_changenr = 0
+	let s:cursor_group_match = ''
+	highlight clear CursorsGroup
+	augroup CursorGroup
+		autocmd!
+	augroup END
 endfunction
 
+call ResetCursors()
+
+"Insert cursor into the correct array index.
+"Ordered from largest to smallest column number
+"to keep correct position when macro is applied.
 function! InsertCursor2Array(curpos)
-	"let s:custom_cursors = s:custom_cursors + [a:curpos]
-	
 	if len(s:custom_cursors) == 0
 		call add(s:custom_cursors, a:curpos)
 	else	
@@ -404,35 +386,41 @@ function! InsertCursor2Array(curpos)
 	endif
 endfunction
 
-function! PurgeCursors()
-	let s:custom_cursors = []
-	let s:cursor_register = ''
-	let s:initial_changenr = -1
-endfunction
-
-function! GetCursors()
-	return s:custom_cursors
-endfunction
-
-function! ApplyCursorRecording()
+function! ApplyCursorChanges()
 	let l:currpos = getcurpos()
 	if len(s:custom_cursors) == 0
-		echo "No cursors found"
+		echo "No cursors found."
 		return
 	endif
-	let l:nundo = changenr() - s:initial_changenr
-	if l:nundo > 0
-		execute "normal! " . l:nundo . "u"
-	endif
-	let l:macro_char = s:cursor_register
 	let l:napply = len(s:custom_cursors)
+	if changenr() - s:initial_changenr > 0
+		execute "normal! u"
+	endif
 	for i in range(l:napply)
+		let l:groupnr = i
 		let l:cursor = s:custom_cursors[i]
 		call setpos('.', l:cursor)
-		execute "normal! @" . l:macro_char
+		execute "normal! ."
 	endfor
 	call setpos('.', l:currpos)
-	call PurgeCursors()
+endfunction
+
+"Add new cursor to cursor list
+function! AddCursor()
+	let l:ncursors = len(s:custom_cursors)
+	let l:curpos = getcurpos()
+	let s:cursor_group_match = s:cursor_group_match . '\|\%'.l:curpos[1].'l\%'.l:curpos[2].'c'
+	execute ':match CursorsGroup /'.s:cursor_group_match[2:].'/'
+	highlight CursorsGroup ctermbg=Cyan guibg=Cyan
+
+	let s:initial_changenr = changenr()
+	augroup CursorGroup
+		autocmd!
+		autocmd TextChangedI * call ApplyCursorChanges()
+		autocmd TextChanged * call ApplyCursorChanges()
+	augroup END
+
+	call InsertCursor2Array(l:curpos)
 endfunction
 "// }}}
 
@@ -464,6 +452,8 @@ endfunction
 function! ChangeSurround()
 	echo ''
 	let comchar = nr2char(getchar())
+	let l:temp_x = @x
+	let l:temp_z = @z
 	if comchar == 'w'
 		let char = nr2char(getchar())
 		let @x = char 
@@ -475,6 +465,8 @@ function! ChangeSurround()
 		let @z = SurroundGetPair(char)
 		execute ':normal! mXF' . comchar . 'r' . char . '`Xf' . SurroundGetPair(comchar) . 'r' . SurroundGetPair(char) . '`Xh'
 	endif
+	let @x = l:temp_x
+	let @z = l:temp_z
 	echo ''
 endfunction
 function! DeleteSurround()
