@@ -8,13 +8,24 @@
 "====================================================================================
 
 call plug#begin('~/.vim/plugged')
-Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
-Plug 'rhysd/vim-clang-format'
-Plug 'funorpain/vim-cpplint'
-Plug 'psf/black'
-Plug 'nvie/vim-flake8'
+"typescript syntax highlighting
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+
+"formatters
 Plug 'MaxMEllon/vim-jsx-pretty'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'svelte', 'yaml', 'html'] }
+Plug 'rhysd/vim-clang-format'
+Plug 'psf/black'
+
+"linters
+Plug 'funorpain/vim-cpplint'
+Plug 'nvie/vim-flake8'
 Plug 'dense-analysis/ale'
+
+"others
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
@@ -194,7 +205,7 @@ nnoremap ; :
 inoremap jj <Esc>
 
 "reload config
-noremap <F5> :source ~/.vimrc<CR>:noh<CR>:echom "Updated configuration!"<CR>
+noremap <F5> :source ~/.vimrc<CR>:noh<CR>:e!<CR>:echom "Reloaded"<CR>
 
 "Open vimrc
 noremap <F6> :tabe ~/.vimrc<CR>
@@ -354,8 +365,8 @@ nnoremap Q @q
 vnoremap Q :norm @q<CR>
 
 "multi-cursor macros
-nnoremap <CR> :call AddCursor()<CR>
-nnoremap <Delete> :call ResetCursors()<CR>:echo "Reset cursors."<CR>
+"nnoremap <CR> :call AddCursor()<CR>
+"nnoremap <Delete> :call ResetCursors()<CR>:echo "Reset cursors."<CR>
 "// {{{ Cursor functions
 function! ResetCursors()
 	let s:custom_cursors = []
@@ -520,30 +531,21 @@ endfunction
 "Formatters for c, js, and py and syntastic linters.
 "====================================================================================
 
-augroup filetype_c
-	autocmd!
-	:autocmd FileType c,cpp,h setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
-	:autocmd BufWritePost *.c,*.cpp,*.h execute ':ClangFormat'
-augroup end
+
+"tab set
+autocmd FileType c,cpp,h setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
+autocmd FileType javascript,typescript,javascriptreact,typescriptreact setlocal shiftwidth=2 tabstop=2
+autocmd FileType python,py setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+"format on save
+autocmd BufWritePost *.c,*.cpp,*.h execute ':ClangFormat'
+autocmd BufWritePost *.ts,*tsx,*.js,*.jsx execute ':PrettierAsync'
+autocmd BufWritePost *.json execute ':%!jq .'
+autocmd BufWritePost *.py execute ':Black' 
+
+"linter
 let g:syntastic_cpp_cpplint_exec = 'cpplint'
 let g:syntastic_cpp_checkers = ['cpplint']
-
-augroup filetype_js
-	autocmd!
-	:autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-	:autocmd BufWritePost *.js execute ':PrettierAsync'
-augroup end
-
-augroup filetype_py
-	autocmd!
-	:autocmd BufWritePost *.py execute ':Black' 
-	:autocmd FileType python,py setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-augroup end
-
-augroup filetype_json
-	autocmd!
-	:autocmd BufWritePost *.json execute ':%!jq .'
-augroup end
 let g:syntastic_python_flake8_exec = 'flake8'
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args = '--ignore="E203, E501"'
