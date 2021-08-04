@@ -80,6 +80,9 @@ endif
 "show line numbers
 set number
 
+"mouse scrolling
+set mouse=n
+
 "show cursor line
 augroup BgHighlight
 	autocmd!
