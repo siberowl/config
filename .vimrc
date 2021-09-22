@@ -25,13 +25,47 @@ Plug 'nvie/vim-flake8'
 Plug 'dense-analysis/ale'
 
 "others
+Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'mbbill/undotree'
 call plug#end()
+
+"to use vim pathogen
+execute pathogen#infect()
 "====================================================================================
+"// }}}
+
+"// {{{ Formatters and linters
+"====================================================================================
+"Formatting
+"
+"Concept:
+"Formatters for c, js, and py and linters.
+"====================================================================================
+
+"formatters
+autocmd FileType c, cpp,h nnoremap <CR> :ClangFormat<CR>
+autocmd FileType javascript,typescript,javascriptreact,typescriptreact nnoremap <CR> :Prettier<CR>
+autocmd FileType json nnoremap <CR> :%!jq .<CR>
+autocmd FileType python nnoremap <CR> :Black<CR>
+
+let g:clang_format#style_options = {
+\ "AllowShortIfStatementsOnASingleLine" : "false",
+\ "BreakBeforeBraces" : "Stroustrup",
+\ "ColumnLimit" : 0,
+            \ "IndentWidth" : 2}
+
+let g:ale_python_flake8_options = '--ignore=E501'
+let g:black_linelength = 120
+let b:ale_linters = ['flake8', 'cc', 'standard', 'tslint', 'tsserver', 'typecheck']
+let g:ale_cpp_gcc_options = '-Wall -std=c++17'
+let g:ale_cpp_clang_options = '-Wall -std=c++17'
+let g:ale_cpp_cc_options = '-Wall -std=c++17'
+"call ale#Set('cpp_cpplint_executable', 'cpplint')
+"call ale#Set('cpp_cpplint_options', '')
 "// }}}
 
 "// {{{ Settings: theme and default settings
@@ -486,35 +520,12 @@ function! DeleteSurround()
 	echo ''
 	let comchar = nr2char(getchar())
 	if comchar == 'w'
-		execute ':normal! mXlbdheldl`Xh'
+		execute ':normal! mXlbdhwdl`Xh'
 	else
 		let char = comchar
-		execute ':normal! mXF' . char . 'dl`Xf' . SurroundGetPair(char) . 'dl`Xh'
+		execute ':normal! mXF' . char . 'dl`Xhf' . SurroundGetPair(char) . 'dl`Xh'
 	endif
 	echo ''
-endfunction
-"// }}}
-
-"yanking file *
-noremap <Leader>y mXggVGy`X
-
-"global search and replace
-"(use %s/pattern/replacement/ for current file)
-nnoremap <Leader>F :call Find<space>
-nnoremap <Leader>R :call FindReplace<space>
-"// {{{ search and replace functions
-command! -nargs=1 Find call Find(<f-args>)
-command! -nargs=* FindReplace call FindReplace(<f-args>)
-function! Find(pattern)
-	execute ':Rg ' . a:pattern
-endfunction
-function! FindReplace(pattern, replacement)
-	execute ':w'
-	call Find(a:pattern)
-	execute ':!(find . -name ''*.cpp'' -o -name ''*.h'' -o -name ''*.py'' -o -name ''*.js'' | xargs sed -i ''s/' . a:pattern . '/'. a:replacement . '/g'')'
-	execute 'normal /<C-l><CR>'
-	execute ':e'
-	call Find(a:replacement)
 endfunction
 "// }}}
 
@@ -523,32 +534,4 @@ endfunction
 
 
 "====================================================================================
-"// }}}
-
-"// {{{ Formatters and linters
-"====================================================================================
-"Formatting
-"
-"Concept:
-"Formatters for c, js, and py and syntastic linters.
-"====================================================================================
-
-
-"tab set
-autocmd FileType c,cpp,h setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
-autocmd FileType javascript,typescript,javascriptreact,typescriptreact setlocal shiftwidth=2 tabstop=2
-autocmd FileType python,py setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-
-"format on save
-autocmd BufWritePost *.c,*.cpp,*.h execute ':ClangFormat'
-autocmd BufWritePost *.ts,*tsx,*.js,*.jsx execute ':PrettierAsync'
-autocmd BufWritePost *.json execute ':%!jq .'
-autocmd BufWritePost *.py execute ':Black' 
-
-"linter
-let g:syntastic_cpp_cpplint_exec = 'cpplint'
-let g:syntastic_cpp_checkers = ['cpplint']
-let g:syntastic_python_flake8_exec = 'flake8'
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_python_flake8_args = '--ignore="E203, E501"'
 "// }}}
