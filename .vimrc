@@ -113,9 +113,6 @@ endif
 "show line numbers
 set number
 
-"mouse scrolling
-set mouse=n
-
 "show cursor line
 augroup BgHighlight
 	autocmd!
@@ -151,6 +148,11 @@ endfunction
 
 "show status line
 set laststatus=2
+
+"set tab settings
+set expandtab
+set tabstop=2
+set shiftwidth=2
 
 "show tabline
 set showtabline=2
@@ -261,12 +263,6 @@ nnoremap <Leader>=l :echo system('ls ~/.vim/sessions')<CR>
 command! SaveSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | echom ''Saved session as default'. g:session_name .''''
 command! QuitSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | :qa'
 command! RestoreSession execute ':source ~/.vim/sessions/default' . g:session_name . ' | noh | echom ''Restored session default'. g:session_name .''''
-
-"Disable arrow keys in non-insert mode
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Right> <Nop>
-noremap <Left> <Nop>
 
 "-----------------------------------------------------
 "// }}}
