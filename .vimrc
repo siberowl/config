@@ -11,12 +11,11 @@ call plug#begin('~/.vim/plugged')
 "typescript syntax highlighting
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
+Plug 'octol/vim-cpp-enhanced-highlight'
 
 "formatters
 Plug 'MaxMEllon/vim-jsx-pretty'
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'svelte', 'yaml', 'html'] }
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'rhysd/vim-clang-format'
 Plug 'psf/black'
 
