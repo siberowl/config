@@ -271,17 +271,9 @@ command! RestoreSession execute ':source ~/.vim/sessions/default' . g:session_na
 "// {{{ Miscellaneous
 "-----------------------------------------------------
 
-"print registers
-nnoremap <Leader>r :registers<CR>:normal! "
-
-"Folding
-nnoremap <Leader>f za
-
-"cd
-nnoremap <Leader>c :cd <C-d>
-
 "Toggle undo tree
 nnoremap <Leader>u :UndotreeToggle<CR>
+
 
 "-----------------------------------------------------
 "// }}}
@@ -290,33 +282,31 @@ nnoremap <Leader>u :UndotreeToggle<CR>
 "// {{{ Navigation
 "-----------------------------------------------------
 
-"Jump to fuzzy searched buffer (fzf)
-nnoremap <Leader>b :Buffers<CR>
-
-"Open previous buffer
-nnoremap <Leader><tab> :b#<CR>
-
-"List and jump to marker
-nnoremap <Leader>m :<C-u>marks<CR>:normal! `
-
-"Jump to fuzzy searched line (fzf)
+"Jump to fuzzy searched line in current file(fzf)
 nnoremap <Leader>l :BLines<CR>
-nnoremap <Leader>L :Lines<CR>
+
+"Jump to fuzzy searched pattern in project (fzf)
+command! ProjectRg execute 'cd '.system('git rev-parse --show-cdup') 'Rg'
+nnoremap <Leader>s :ProjectRg<CR>
+
+"Jump to fuzzy searched project file (fzf)
+command! ProjectFiles execute 'cd '.system('git rev-parse --show-cdup') 'GFiles'
+nnoremap <Leader>f :ProjectFiles<CR>
 
 "Page up/down
-nnoremap <Leader>j <C-d>
-nnoremap <Leader>k <C-u>
+noremap <Leader>j }
+noremap <Leader>k {
 
 "Window navigation
-nnoremap J <C-W><C-J>
-nnoremap K <C-W><C-K>
-nnoremap L <C-W><C-L>
-nnoremap H <C-W><C-H>
+nnoremap <Down> <C-W><C-J>
+nnoremap <Up> <C-W><C-K>
+nnoremap <Right> <C-W><C-L>
+nnoremap <Left> <C-W><C-H>
 
 "EasyMotion setup
+let g:EasyMotion_smartcase = 1 "v will match both v and V, but V will match V only
 map , <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
 map  n <Plug>(easymotion-next)
 map  N <Plug>(easymotion-prev)
 
@@ -392,87 +382,19 @@ endfunction
 "// {{{ Edits
 "-----------------------------------------------------
 
+
+"Tab for auto-completion
+inoremap <Tab> <C-n>
+
 "macro shortcut
 nnoremap Q @q
 vnoremap Q :norm @q<CR>
-
-"multi-cursor macros
-"nnoremap <CR> :call AddCursor()<CR>
-"nnoremap <Delete> :call ResetCursors()<CR>:echo "Reset cursors."<CR>
-"// {{{ Cursor functions
-function! ResetCursors()
-	let s:custom_cursors = []
-	let s:initial_changenr = 0
-	let s:cursor_group_match = ''
-	highlight clear CursorsGroup
-	augroup CursorGroup
-		autocmd!
-	augroup END
-endfunction
-
-call ResetCursors()
-
-"Insert cursor into the correct array index.
-"Ordered from largest to smallest column number
-"to keep correct position when macro is applied.
-function! InsertCursor2Array(curpos)
-	if len(s:custom_cursors) == 0
-		call add(s:custom_cursors, a:curpos)
-	else	
-		for i in range(len(s:custom_cursors))
-			if s:custom_cursors[i][2] < a:curpos[2]
-				call insert(s:custom_cursors, a:curpos, i)
-				return
-			endif
-		endfor
-		call add(s:custom_cursors, a:curpos)
-	endif
-endfunction
-
-function! ApplyCursorChanges()
-	let l:currpos = getcurpos()
-	if len(s:custom_cursors) == 0
-		echo "No cursors found."
-		return
-	endif
-	let l:napply = len(s:custom_cursors)
-	if changenr() - s:initial_changenr > 0
-		execute "normal! u"
-	endif
-	for i in range(l:napply)
-		let l:groupnr = i
-		let l:cursor = s:custom_cursors[i]
-		call setpos('.', l:cursor)
-		execute "normal! ."
-	endfor
-	call setpos('.', l:currpos)
-endfunction
-
-"Add new cursor to cursor list
-function! AddCursor()
-	let l:ncursors = len(s:custom_cursors)
-	let l:curpos = getcurpos()
-	let s:cursor_group_match = s:cursor_group_match . '\|\%'.l:curpos[1].'l\%'.l:curpos[2].'c'
-	execute ':match CursorsGroup /'.s:cursor_group_match[2:].'/'
-	highlight CursorsGroup ctermbg=Cyan guibg=Cyan
-
-	let s:initial_changenr = changenr()
-	augroup CursorGroup
-		autocmd!
-		autocmd TextChangedI * call ApplyCursorChanges()
-		autocmd TextYankPost * call ApplyCursorChanges()
-	augroup END
-
-	call InsertCursor2Array(l:curpos)
-endfunction
-"// }}}
 
 "Bracket auto-completes
 inoremap <F2> <Esc>yypa/<Esc>O
 inoremap {<CR>  {<CR>}<Esc>O
 inoremap [<CR>  [<CR>]<Esc>O
 inoremap (<CR>  (<CR>)<Esc>O
-
 
 "surround commands
 nnoremap cs :call ChangeSurround()<CR>
