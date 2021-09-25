@@ -15,6 +15,11 @@ Plug 'peitalin/vim-jsx-typescript'
 "formatters
 Plug 'rhysd/vim-clang-format' "C family formatter
 Plug 'psf/black' "python formatter
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+
+"Language server protocol
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 
 "others
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
