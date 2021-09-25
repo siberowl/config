@@ -94,6 +94,9 @@ let g:fzf_colors =
 
 "// }}}
 
+let g:lsp_diagnostics_signs_error = {'text': '>>'}
+let g:lsp_diagnostics_signs_warning = {'text': '--'}
+
 "// }}}
 
 "// {{{ Formatters and linters
@@ -104,6 +107,10 @@ let g:fzf_colors =
 "Formatters for c, js, and py and linters.
 "====================================================================================
 
+autocmd BufWrite *.js,*.jsx,*.ts,*.tsx execute ":Prettier"
+let g:lsp_diagnostics_echo_delay = 100
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_highlights_enabled = 0
 
 "// }}}
 
