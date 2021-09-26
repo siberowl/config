@@ -389,7 +389,9 @@ nnoremap <C-h> :bp<CR>
 "// {{{ Edits
 "-----------------------------------------------------
 
-inoremap <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
 "macro shortcut (qq to record, q to stop, Q to apply)
 nnoremap Q @q
