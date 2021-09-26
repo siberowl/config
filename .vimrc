@@ -8,12 +8,14 @@
 "====================================================================================
 
 call plug#begin('~/.vim/plugged')
+"visuals
+Plug 'arzg/vim-corvine'
+Plug 'itchyny/lightline.vim'
+Plug 'mengelbrecht/lightline-bufferline'
+
 "syntax highlighting
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
-
-"colorscheme
-Plug 'arzg/vim-corvine'
 
 "formatters
 Plug 'rhysd/vim-clang-format' "C family formatter
@@ -24,14 +26,18 @@ Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
 
-"others
+"Auto-complete
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+
+"Fuzzy search
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+
+"others
 Plug 'easymotion/vim-easymotion'
 Plug 'mbbill/undotree'
 Plug 'siberowl/vim-tiny-surround'
-Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
 call plug#end()
 
 "====================================================================================
@@ -383,7 +389,9 @@ nnoremap <C-h> :bp<CR>
 "// {{{ Edits
 "-----------------------------------------------------
 
-inoremap <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
 "macro shortcut (qq to record, q to stop, Q to apply)
 nnoremap Q @q
