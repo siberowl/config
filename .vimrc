@@ -12,6 +12,9 @@ call plug#begin('~/.vim/plugged')
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 
+"colorscheme
+Plug 'arzg/vim-corvine'
+
 "formatters
 Plug 'rhysd/vim-clang-format' "C family formatter
 Plug 'psf/black' "python formatter
