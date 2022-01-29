@@ -55,7 +55,7 @@ call plug#end()
 
 "colorscheme cycler
 let g:schemes = [['corvine_light', 'selenized_light'],['corvine', 'selenized_black']]
-let s:color_index = 0
+let s:color_index = 1
 function! s:cyclecolor()
   let s:color_index = (s:color_index + 1) % len(g:schemes)
   execute "colo " . g:schemes[s:color_index][0]
@@ -67,12 +67,12 @@ endfunction
 
 "colorscheme
 set termguicolors
-execute "colo " . g:schemes[0][0]
+execute "colo " . g:schemes[s:color_index][0]
 
 "// {{{ lightline
 
 let g:lightline = {
-      \ 'colorscheme': g:schemes[0][1],
+      \ 'colorscheme': g:schemes[s:color_index][1],
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ]
       \ },
