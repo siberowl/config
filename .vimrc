@@ -53,14 +53,26 @@ call plug#end()
 
 "// {{{ Colors
 
+"colorscheme cycler
+let g:schemes = [['corvine_light', 'selenized_light'],['corvine', 'selenized_black']]
+let s:color_index = 0
+function! s:cyclecolor()
+  let s:color_index = (s:color_index + 1) % len(g:schemes)
+  execute "colo " . g:schemes[s:color_index][0]
+  let g:lightline = { 'colorscheme': g:schemes[s:color_index][1] }
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+
 "colorscheme
 set termguicolors
-colo corvine_light
+execute "colo " . g:schemes[0][0]
 
 "// {{{ lightline
 
 let g:lightline = {
-      \ 'colorscheme': 'selenized_light',
+      \ 'colorscheme': g:schemes[0][1],
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ]
       \ },
@@ -299,6 +311,7 @@ command! ProfileEnd execute ':profile pause | qa!'
 "Toggle undo tree
 nnoremap <Leader>u :UndotreeToggle<CR>
 
+nnoremap <Leader>c :call <SID>cyclecolor()<CR>
 
 "-----------------------------------------------------
 "// }}}
