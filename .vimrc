@@ -69,6 +69,11 @@ endfunction
 set termguicolors
 execute "colo " . g:schemes[s:color_index][0]
 
+let g:lsp_diagnostics_signs_error = {'text': '>>'}
+let g:lsp_diagnostics_signs_warning = {'text': '--'}
+
+"// }}}
+
 "// {{{ lightline
 
 let g:lightline = {
