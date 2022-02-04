@@ -11,7 +11,7 @@ call plug#begin('~/.vim/plugged')
 "visuals
 Plug 'arzg/vim-corvine'
 Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
+Plug 'bling/vim-bufferline'
 
 "syntax highlighting
 Plug 'leafgarland/typescript-vim'
@@ -69,6 +69,11 @@ endfunction
 set termguicolors
 execute "colo " . g:schemes[s:color_index][0]
 
+let g:lsp_diagnostics_signs_error = {'text': '>>'}
+let g:lsp_diagnostics_signs_warning = {'text': '--'}
+
+"// }}}
+
 "// {{{ lightline
 
 let g:lightline = {
@@ -76,16 +81,6 @@ let g:lightline = {
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ]
       \ },
-      \ 'tabline': {
-      \   'left': [ ['buffers'] ],
-      \   'right': [ ['close'] ]
-      \ },
-      \ 'component_expand': {
-      \   'buffers': 'lightline#bufferline#buffers'
-      \ },
-      \ 'component_type': {
-      \   'buffers': 'tabsel'
-      \ }
       \ }
 
 let g:lightline.enable = {
@@ -113,10 +108,8 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
-"// }}}
+command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 
-let g:lsp_diagnostics_signs_error = {'text': '>>'}
-let g:lsp_diagnostics_signs_warning = {'text': '--'}
 
 "// }}}
 
@@ -129,6 +122,7 @@ let g:lsp_diagnostics_signs_warning = {'text': '--'}
 "====================================================================================
 
 autocmd BufWrite *.js,*.jsx,*.ts,*.tsx execute ":Prettier"
+autocmd BufWrite *.py,*.go execute ":LspDocumentFormat"
 let g:lsp_diagnostics_echo_delay = 100
 let g:lsp_diagnostics_echo_cursor = 1
 let g:lsp_diagnostics_highlights_enabled = 0
@@ -162,6 +156,8 @@ endfunction
 "show status line
 set laststatus=2
 
+set shortmess+=I
+
 "highlight searched word
 set hlsearch!
 set nohlsearch
@@ -188,9 +184,6 @@ set wildmenu
 
 "Set backspace behavior
 set backspace=indent,eol,start
-
-"Use tabs for buffer switching
-set switchbuf=usetab
 
 "window splitting
 set splitbelow
@@ -283,7 +276,7 @@ inoremap jj <Esc>
 noremap <F5> :source ~/.vimrc<CR>:noh<CR>:e!<CR>:echom "Reloaded"<CR>
 
 "Open vimrc
-noremap <F6> :tabe ~/.vimrc<CR>
+noremap <F6> :e ~/.vimrc<CR>
 
 "Save
 noremap <Leader><Leader> :w<CR>
@@ -333,6 +326,9 @@ nnoremap <Leader>f :ProjectFiles<CR>
 
 nnoremap <Leader>b :Buffers<CR>
 
+nnoremap <Leader>d :LspNextDiagnostic<CR>
+nnoremap <Leader>D :LspPreviousDiagnostic<CR>
+
 "Window navigation
 nnoremap J <C-W><C-J>
 nnoremap K <C-W><C-K>
@@ -355,14 +351,16 @@ noremap <Leader>. $
 noremap <Leader>, ^
 
 "Page up/down
-nnoremap <Leader>j m`<PageDown>
-nnoremap <Leader>k m`<PageUp>
+nnoremap <Leader>j <C-d>
+nnoremap <Leader>k <C-u>
 
 "Backspace to go back to previous marker
 nnoremap <Backspace> ``
 
 "Explorer
 nnoremap <Leader>e :Explore<CR>
+
+nnoremap <Leader>t :tabnew<CR>
 
 "New splits
 nnoremap <Leader>V :call MaximizeToggle()<CR>
@@ -385,13 +383,13 @@ function! MaximizeToggle()
 endfunction
 "// }}}
 
-"New tab
-nnoremap <Leader>t :tabe<CR>:Explore<CR>
-
 "Quit
 noremap <Leader>w :bd<CR>
- 
-"vim tab switcher
+
+"tab to swap between buffers
+nnoremap <Tab> <C-^>
+
+"vim tab switching
 nnoremap <C-l> :bn<CR>
 nnoremap <C-h> :bp<CR>
 
@@ -404,7 +402,7 @@ nnoremap <C-h> :bp<CR>
 
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
 
 "macro shortcut (qq to record, q to stop, Q to apply)
 nnoremap Q @q
