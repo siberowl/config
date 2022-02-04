@@ -156,6 +156,8 @@ endfunction
 "show status line
 set laststatus=2
 
+set shortmess+=I
+
 "highlight searched word
 set hlsearch!
 set nohlsearch
