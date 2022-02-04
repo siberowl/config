@@ -108,10 +108,8 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
-"// }}}
+command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 
-let g:lsp_diagnostics_signs_error = {'text': '>>'}
-let g:lsp_diagnostics_signs_warning = {'text': '--'}
 
 "// }}}
 
