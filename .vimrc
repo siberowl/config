@@ -122,6 +122,7 @@ command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-hea
 "====================================================================================
 
 autocmd BufWrite *.js,*.jsx,*.ts,*.tsx execute ":Prettier"
+autocmd BufWrite *.py,*.go execute ":LspDocumentFormat"
 let g:lsp_diagnostics_echo_delay = 100
 let g:lsp_diagnostics_echo_cursor = 1
 let g:lsp_diagnostics_highlights_enabled = 0
@@ -326,6 +327,9 @@ nnoremap <Leader>f :ProjectFiles<CR>
 
 nnoremap <Leader>b :Buffers<CR>
 
+nnoremap <Leader>d :LspNextDiagnostic<CR>
+nnoremap <Leader>D :LspPreviousDiagnostic<CR>
+
 "Window navigation
 nnoremap J <C-W><C-J>
 nnoremap K <C-W><C-K>
@@ -397,7 +401,7 @@ nnoremap <C-h> :bp<CR>
 
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
 
 "macro shortcut (qq to record, q to stop, Q to apply)
 nnoremap Q @q
