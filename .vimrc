@@ -351,8 +351,8 @@ noremap <Leader>. $
 noremap <Leader>, ^
 
 "Page up/down
-nnoremap <Leader>j m`<PageDown>
-nnoremap <Leader>k m`<PageUp>
+nnoremap <Leader>j <C-d>
+nnoremap <Leader>k <C-u>
 
 "Backspace to go back to previous marker
 nnoremap <Backspace> ``
