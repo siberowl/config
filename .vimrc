@@ -185,9 +185,6 @@ set wildmenu
 "Set backspace behavior
 set backspace=indent,eol,start
 
-"Use tabs for buffer switching
-set switchbuf=usetab
-
 "window splitting
 set splitbelow
 set splitright
@@ -279,7 +276,7 @@ inoremap jj <Esc>
 noremap <F5> :source ~/.vimrc<CR>:noh<CR>:e!<CR>:echom "Reloaded"<CR>
 
 "Open vimrc
-noremap <F6> :tabe ~/.vimrc<CR>
+noremap <F6> :e ~/.vimrc<CR>
 
 "Save
 noremap <Leader><Leader> :w<CR>
@@ -363,6 +360,8 @@ nnoremap <Backspace> ``
 "Explorer
 nnoremap <Leader>e :Explore<CR>
 
+nnoremap <Leader>t :tabnew<CR>
+
 "New splits
 nnoremap <Leader>V :call MaximizeToggle()<CR>
 nnoremap <Leader>vv :vs<CR><C-w>=:Explore<CR>
@@ -384,13 +383,13 @@ function! MaximizeToggle()
 endfunction
 "// }}}
 
-"New tab
-nnoremap <Leader>t :tabe<CR>:Explore<CR>
-
 "Quit
 noremap <Leader>w :bd<CR>
- 
-"vim tab switcher
+
+"tab to swap between buffers
+nnoremap <Tab> <C-^>
+
+"vim tab switching
 nnoremap <C-l> :bn<CR>
 nnoremap <C-h> :bp<CR>
 
