@@ -11,7 +11,7 @@ call plug#begin('~/.vim/plugged')
 "visuals
 Plug 'arzg/vim-corvine'
 Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
+Plug 'bling/vim-bufferline'
 
 "syntax highlighting
 Plug 'leafgarland/typescript-vim'
