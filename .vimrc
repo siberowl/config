@@ -38,6 +38,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'mbbill/undotree'
 Plug 'siberowl/vim-tiny-surround'
+Plug 'wting/gitsessions.vim'
 call plug#end()
 
 "====================================================================================
@@ -212,19 +213,6 @@ autocmd BufEnter * silent! lcd %:p:h
 "update file automatically on change
 set autoread
 
-"set project directory
-autocmd VimEnter * call OnEnter()
-function! OnEnter()
-  let curr_dir = getcwd()
-  let g:session_name = substitute(curr_dir, '\/', '-', 'g')
-  let g:branch_name = system('git rev-parse --abbrev-ref HEAD')
-  if v:shell_error !=0
-  else
-    let g:session_name = g:session_name . '-' . substitute(g:branch_name, '\/', '-', 'g')
-  endif
-endfunction
-
-
 "// }}}
 
 "// {{{ Others
@@ -282,15 +270,11 @@ noremap <F6> :e ~/.vimrc<CR>
 noremap <Leader><Leader> :w<CR>
 
 "session handling
-nnoremap <Leader>=s :SaveSession<CR>
-nnoremap <Leader>=q :QuitSession<CR>
-nnoremap <Leader>=r :RestoreSession<CR>
-nnoremap <Leader>=l :echo system('ls ~/.vim/sessions')<CR>
+nnoremap <Leader>S :GitSessionSave<CR>
+nnoremap <Leader>L :GitSessionLoad<CR>
+nnoremap <Leader>D :GitSessionDelete<CR>
 
-command! SaveSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | echom ''Saved session as default'. g:session_name .''''
-command! QuitSession execute ':mks! ~/.vim/sessions/default' . g:session_name . ' | :qa'
-command! RestoreSession execute ':source ~/.vim/sessions/default' . g:session_name . ' | noh | echom ''Restored session default'. g:session_name .''''
-
+"Profiling
 command! ProfileStart execute ':profile start ~/.vim/profile.log | profile func * | profile file *'
 command! ProfileEnd execute ':profile pause | qa!'
 
@@ -324,10 +308,10 @@ nnoremap <Leader>s :ProjectRg<CR>
 command! ProjectFiles execute 'GFiles ' . system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
 nnoremap <Leader>f :ProjectFiles<CR>
 
-nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>p :Buffers<CR>
 
-nnoremap <Leader>d :LspNextDiagnostic<CR>
-nnoremap <Leader>D :LspPreviousDiagnostic<CR>
+nnoremap <left> :LspPreviousDiagnostic<CR>
+nnoremap <right> :LspNextDiagnostic<CR>
 
 "Window navigation
 nnoremap J <C-W><C-J>
@@ -338,7 +322,7 @@ nnoremap H <C-W><C-H>
 "EasyMotion setup
 let g:EasyMotion_smartcase = 1 "v will match both v and V, but V will match V only
 map , <Plug>(easymotion-prefix)
-map  / <Plug>(easymotion-sn)
+map  / <Plug>(easymotion-s)
 map  n <Plug>(easymotion-next)
 map  N <Plug>(easymotion-prev)
 
@@ -403,6 +387,7 @@ nnoremap <C-h> :bp<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
+imap <c-space> <Plug>(asyncomplete_force_refresh)
 
 "macro shortcut (qq to record, q to stop, Q to apply)
 nnoremap Q @q
