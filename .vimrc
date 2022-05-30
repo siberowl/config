@@ -10,12 +10,11 @@
 call plug#begin('~/.vim/plugged')
 "visuals
 Plug 'arzg/vim-corvine'
+Plug 'sickill/vim-monokai'
+Plug 'dracula/vim'
 Plug 'itchyny/lightline.vim'
 Plug 'bling/vim-bufferline'
-
-"syntax highlighting
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
+Plug 'HerringtonDarkholme/yats.vim'
 
 "formatters
 Plug 'rhysd/vim-clang-format' "C family formatter
@@ -55,8 +54,8 @@ call plug#end()
 "// {{{ Colors
 
 "colorscheme cycler
-let g:schemes = [['corvine_light', 'selenized_light'],['corvine', 'selenized_black']]
-let s:color_index = 1
+let g:schemes = [['corvine_light', 'selenized_light'],['corvine', 'selenized_black'],['dracula', 'dracula']]
+let s:color_index = 2
 function! s:cyclecolor()
   let s:color_index = (s:color_index + 1) % len(g:schemes)
   execute "colo " . g:schemes[s:color_index][0]
@@ -69,6 +68,8 @@ endfunction
 "colorscheme
 set termguicolors
 execute "colo " . g:schemes[s:color_index][0]
+
+syntax enable
 
 let g:lsp_diagnostics_signs_error = {'text': '>>'}
 let g:lsp_diagnostics_signs_warning = {'text': '--'}
@@ -109,7 +110,25 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
-command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+" Set fzf window dimensions.
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8 } }
+
+" Set preview window colorscheme.
+let $BAT_THEME="Dracula"
+
+" Set default preview window layout.
+let $FZF_DEFAULT_OPTS="--preview-window 'right:60%' --layout reverse"
+
+" Blines with preview
+command! -bang -nargs=* CustomBLines
+    \ call fzf#vim#grep(
+    \   'rg --with-filename --column --line-number --no-heading --smart-case . '.fnameescape(expand('%:p')), 1,
+    \   fzf#vim#with_preview({'options': '--keep-right --delimiter : --nth 4..'}), <bang>0)
+
+" Set ripgrep preview window
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, 
+  \ fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}), <bang>0)
 
 
 "// }}}
@@ -122,7 +141,7 @@ command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-hea
 "Formatters for c, js, and py and linters.
 "====================================================================================
 
-autocmd BufWrite *.js,*.jsx,*.ts,*.tsx execute ":Prettier"
+autocmd BufWrite *.js,*.jsx,*.ts,*.tsx execute ":PrettierAsync"
 autocmd BufWrite *.py,*.go execute ":LspDocumentFormat"
 let g:lsp_diagnostics_echo_delay = 100
 let g:lsp_diagnostics_echo_cursor = 1
@@ -298,20 +317,25 @@ nnoremap <Leader>c :call <SID>cyclecolor()<CR>
 "-----------------------------------------------------
 
 "Jump to fuzzy searched line in current file(fzf)
-nnoremap <Leader>l :BLines<CR>
+nnoremap <Leader>f :CustomBLines<CR>
 
 "Jump to fuzzy searched pattern in project (fzf)
 command! ProjectRg execute 'lcd ' . system('git rev-parse --show-toplevel') 'Rg'
-nnoremap <Leader>s :ProjectRg<CR>
+nnoremap <Leader>F :ProjectRg<CR>
 
 "Jump to fuzzy searched project file (fzf)
 command! ProjectFiles execute 'GFiles ' . system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-nnoremap <Leader>f :ProjectFiles<CR>
+nnoremap <Leader>p :ProjectFiles<CR>
 
-nnoremap <Leader>p :Buffers<CR>
+nnoremap <Leader>b :Buffers<CR>
 
 nnoremap <left> :LspPreviousDiagnostic<CR>
 nnoremap <right> :LspNextDiagnostic<CR>
+nnoremap <up> :LspPreviousError<CR>
+nnoremap <down> :LspNextError<CR>
+
+nnoremap gd :LspDefinition<CR>
+nnoremap gD :LspDeclaration<CR>
 
 "Window navigation
 nnoremap J <C-W><C-J>
