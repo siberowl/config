@@ -122,8 +122,9 @@ let $FZF_DEFAULT_OPTS="--preview-window 'right:60%' --layout reverse"
 " Blines with preview
 command! -bang -nargs=* CustomBLines
     \ call fzf#vim#grep(
-    \   'rg --with-filename --column --line-number --no-heading --smart-case . '.fnameescape(expand('%:p')), 1,
-    \   fzf#vim#with_preview({'options': '--keep-right --delimiter : --nth 4..'}), <bang>0)
+    \   'rg --with-filename --column --line-number --no-heading --color=always --smart-case . '.fnameescape(expand('%')), 1,
+    \   fzf#vim#with_preview({'options': '--keep-right --delimiter : --nth 4..'}),
+    \   1)
 
 " Set ripgrep preview window
 command! -bang -nargs=* Rg
@@ -320,7 +321,7 @@ nnoremap <Leader>c :call <SID>cyclecolor()<CR>
 nnoremap <Leader>f :CustomBLines<CR>
 
 "Jump to fuzzy searched pattern in project (fzf)
-command! ProjectRg execute 'lcd ' . system('git rev-parse --show-toplevel') 'Rg'
+command! ProjectRg execute 'lcd ' . system('git rev-parse --show-cdup') . 'Rg'
 nnoremap <Leader>F :ProjectRg<CR>
 
 "Jump to fuzzy searched project file (fzf)
