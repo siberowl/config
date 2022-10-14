@@ -1,7 +1,8 @@
 [alias]
   s = status
-  a = add -p
-  aa = add -u :/
+  a = add
+  aa = add -u 
+  ap = add -p
   c = "!f(){ git commit -m \"$(git branch --show-current) $1\"; }; f"
   sw = "!f(){ ( git switch $1 && exit 0;); git fetch origin $1 && git switch $1; }; f"
   p = push
@@ -10,3 +11,6 @@
   d = diff
   dd = diff origin/main...
   g = grep
+[user]
+	email = kon.aoki.us@gmail.com
+	name = siberowl
