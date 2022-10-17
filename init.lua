@@ -25,6 +25,7 @@ Plug('ms-jpq/coq.thirdparty', {branch = '3p'})
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+Plug 'm-demare/hlargs.nvim'
 Plug('akinsho/bufferline.nvim', { tag = 'v2.*' })
 Plug 'petertriho/nvim-scrollbar'
 Plug 'romainl/vim-cool/'
@@ -68,6 +69,7 @@ require("telescope").load_extension("file_browser")
 require("bufferline").setup({})
 require('gitsigns').setup()
 require("scrollbar").setup()
+require('hlargs').setup()
 
 -- Essential mappings
 map('n', ';', ':', options) -- Map semicolon
@@ -102,6 +104,7 @@ end, options) -- Search in repo
 map('n', '<Leader>p', builtin.git_files, options) -- Search for a file
 map('n', '<Leader>b', builtin.buffers, options) -- Search for buffer
 map('n', '<Leader>e', ':Telescope file_browser hidden=true<cr>', options) -- File explorer
+map('n', '<Leader>m', builtin.marks, options) -- Search for buffer
 
 
 -- Hop mappings
@@ -119,7 +122,7 @@ end, {remap=true})
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 local opts = { noremap=true, silent=true }
 local dg = vim.diagnostic
-map('n', '<space>d', dg.open_float, opts)
+map('n', '<leader>d', dg.open_float, opts)
 map('n', '[d', dg.goto_prev, opts)
 map('n', ']d', dg.goto_next, opts)
 
@@ -134,8 +137,8 @@ local on_attach = function(client, bufnr)
   map('n', 'gi', buf.implementation, bufopts)
   map('n', 'gr', buf.references, bufopts)
   map('n', 'K', buf.hover, bufopts)
-  map('n', '<space>D', buf.type_definition, bufopts)
-  map('n', '<space>r', buf.rename, bufopts)
-  map('n', '<space>a', buf.code_action, bufopts)
+  map('n', '<leader>D', buf.type_definition, bufopts)
+  map('n', '<leader>r', buf.rename, bufopts)
+  map('n', '<leader>a', buf.code_action, bufopts)
   map('n', '<F1>', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
