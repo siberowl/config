@@ -29,6 +29,7 @@ Plug('akinsho/bufferline.nvim', { tag = 'v2.*' })
 Plug 'petertriho/nvim-scrollbar'
 Plug 'romainl/vim-cool/'
 Plug 'siberowl/vim-tiny-surround'
+Plug 'bling/vim-bufferline'
 
 vim.call('plug#end')
 
@@ -41,6 +42,10 @@ g.netrw_liststyle = 3
 g.laststatus = 2
 g.coq_settings = {auto_start = 'shut-up'}
 g.hlsearch = false
+o.expandtab = true
+o.tabstop = 2
+o.shiftwidth = 2
+o.autoindent = true
 o.mouse = ""
 o.scrolloff=999
 o.termguicolors = true
